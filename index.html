@@ -1,721 +1,298 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escape Room: O Laboratório Esquecido</title>
+    <title>Master Química - Desafio Vestibular</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap');
-
-        :root {
-            --neon-green: #39ff14;
-            --neon-blue: #00f3ff;
-            --neon-red: #ff003c;
-            --dark-bg: #0a0a0f;
-            --panel-bg: #11111a;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
         body {
-            font-family: 'Rajdhani', sans-serif;
-            background-color: var(--dark-bg);
-            color: #e0e0e0;
-            overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.05), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(57, 255, 20, 0.05), transparent 25%);
-        }
-
-        .font-mono {
-            font-family: 'Share Tech Mono', monospace;
-        }
-
-        /* Animações e Efeitos */
-        .glitch-text {
-            text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue);
-            animation: glitch 2s infinite alternate-reverse;
-        }
-
-        @keyframes glitch {
-            0% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
-            20% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
-            40% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
-            60% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
-            80% { text-shadow: 2px 0 var(--neon-red), -2px 0 var(--neon-blue); }
-            100% { text-shadow: -2px 0 var(--neon-red), 2px 0 var(--neon-blue); }
-        }
-
-        .shake {
-            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .solved-card {
-            border-color: var(--neon-green) !important;
-            box-shadow: 0 0 15px rgba(57, 255, 20, 0.2);
-            transition: all 0.5s ease;
-        }
-
-        .solved-card * {
-            opacity: 0.7;
-            pointer-events: none;
-        }
-
-        .solved-badge {
-            display: none;
-            color: var(--neon-green);
-        }
-        
-        .solved-card .solved-badge {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            min-height: 100vh;
             display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            opacity: 1;
-        }
-
-        /* Componentes Customizados */
-        .input-hacker {
-            background: rgba(0,0,0,0.5);
-            border: 1px solid #333;
-            color: var(--neon-blue);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-        }
-        
-        .input-hacker:focus {
-            outline: none;
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
-        }
-
-        /* Drag and Drop */
-        .drop-zone {
-            border: 2px dashed #444;
-            transition: all 0.3s;
-        }
-        .drop-zone.drag-over {
-            border-color: var(--neon-blue);
-            background: rgba(0, 243, 255, 0.1);
-        }
-
-        /* Tabela Periódica Map */
-        .pt-grid {
-            display: grid;
-            grid-template-columns: repeat(18, minmax(30px, 1fr));
-            gap: 2px;
-            width: max-content;
-            padding: 10px;
-        }
-
-        .pt-element {
-            width: 40px;
-            height: 45px;
-            background: #1a1a24;
-            border: 1px solid #333;
-            display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
+            margin: 0;
+            padding: 20px;
+            color: #2d3748;
         }
 
-        .pt-element:hover {
-            background: #2a2a3a;
-            border-color: var(--neon-blue);
-            transform: scale(1.1);
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(0,243,255,0.5);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
         }
 
-        .pt-element.active-target {
-            animation: pulse-target 1.5s infinite;
+        .option-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid #edf2f7;
         }
 
-        @keyframes pulse-target {
-            0% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 243, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 243, 255, 0); }
+        .option-btn:hover:not(:disabled) {
+            border-color: #4c51bf;
+            background-color: #f7fafc;
+            transform: translateX(10px);
         }
 
-        .d-pad-btn {
-            background: #222;
-            border: 1px solid #444;
-            transition: all 0.2s;
-        }
-        .d-pad-btn:hover {
-            background: var(--neon-blue);
-            color: black;
-            border-color: var(--neon-blue);
+        .correct {
+            background-color: #c6f6d5 !important;
+            border-color: #48bb78 !important;
+            color: #22543d !important;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--dark-bg); }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-blue); }
-
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
+        .wrong {
+            background-color: #fed7d7 !important;
+            border-color: #f56565 !important;
+            color: #742a2a !important;
         }
 
-        .toast {
-            background: rgba(17, 17, 26, 0.95);
-            border-left: 4px solid;
-            padding: 1rem;
-            margin-top: 0.5rem;
-            border-radius: 4px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-            animation: slideIn 0.3s forwards, fadeOut 0.5s 2.5s forwards;
-            opacity: 0;
-            transform: translateX(100%);
+        .progress-bar {
+            height: 10px;
+            background-color: #edf2f7;
+            border-radius: 10px;
+            overflow: hidden;
         }
 
-        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateX(100%); } }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.4s ease;
+        }
+
+        sub { bottom: -0.25em; font-size: 0.75em; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center">
+<body>
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center p-6 text-center">
-        <i data-lucide="flask-conical" class="w-24 h-24 text-neon-blue mb-6 animate-pulse"></i>
-        <h1 class="text-5xl md:text-7xl font-bold mb-4 glitch-text font-mono text-white">PROJETO ALQUIMIA</h1>
-        <p class="text-xl md:text-2xl text-gray-400 max-w-2xl mb-8">
-            Você está preso nas ruínas de um antigo laboratório químico. Para escapar, você precisará provar seu conhecimento sobre os blocos construtores do universo. Desvende os cadeados.
-        </p>
-        <button onclick="startGame()" class="px-8 py-4 bg-transparent border-2 border-neon-blue text-neon-blue text-xl font-bold rounded hover:bg-neon-blue hover:text-black transition-all duration-300 shadow-[0_0_15px_rgba(0,243,255,0.4)]">
-            INICIAR FUGA
-        </button>
-    </div>
-
-    <!-- Main Game Container -->
-    <div id="game-container" class="hidden w-full max-w-4xl p-4 md:p-8 relative">
-        
-        <!-- Header & Progress -->
-        <header class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4 bg-panel-bg p-4 rounded-lg border border-gray-800 shadow-lg">
-            <div>
-                <h2 id="level-title" class="text-2xl md:text-3xl font-bold text-neon-blue font-mono">Nível 1</h2>
-                <p id="level-desc" class="text-gray-400 text-sm md:text-base"></p>
+    <div class="glass-card p-8 md:p-12">
+        <!-- Tela Inicial -->
+        <div id="start-screen" class="text-center my-auto">
+            <div class="mb-6 inline-block p-4 bg-indigo-100 rounded-full">
+                <span class="text-5xl">🔬</span>
             </div>
-            <div class="flex items-center gap-4">
-                <button onclick="togglePeriodicTable()" class="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-600 rounded hover:border-neon-blue hover:text-neon-blue transition-colors">
-                    <i data-lucide="grid-3x3"></i>
-                    <span>Mapa Periódico</span>
-                </button>
+            <h1 class="text-4xl font-black text-gray-800 mb-4 tracking-tight">Master Química: 2º Ano EM</h1>
+            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Prepare-se para o vestibular! Enfrente 40 questões sobre Ligações Químicas, Geometria, Mol e Concentração de Soluções.
+            </p>
+            <button onclick="startGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl text-xl shadow-lg transition transform hover:-translate-y-1">
+                Iniciar Grande Desafio
+            </button>
+            <div class="mt-10 grid grid-cols-2 gap-4 text-sm text-gray-500 font-medium">
+                <div class="p-3 bg-gray-50 rounded-lg">Módulo 1: Ligações & VSEPR</div>
+                <div class="p-3 bg-gray-50 rounded-lg">Módulo 2: Mol & Soluções</div>
+            </div>
+        </div>
+
+        <!-- Tela de Jogo -->
+        <div id="game-screen" class="hidden flex-grow flex flex-col">
+            <div class="flex justify-between items-end mb-4">
+                <div>
+                    <p id="question-counter" class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Questão 1 de 40</p>
+                    <h3 id="topic-label" class="text-sm text-gray-400">Tópico: Ligações Químicas</h3>
+                </div>
                 <div class="text-right">
-                    <div class="text-sm text-gray-400 mb-1">Progresso do Nível</div>
-                    <div class="w-32 h-2 bg-gray-800 rounded overflow-hidden">
-                        <div id="progress-bar" class="h-full bg-neon-green w-0 transition-all duration-500"></div>
-                    </div>
-                    <div id="progress-text" class="text-xs mt-1 font-mono text-neon-green">0/7</div>
+                    <span id="score-display" class="text-lg font-bold text-gray-800">Acertos: 0</span>
                 </div>
             </div>
-        </header>
-
-        <!-- Locks Container -->
-        <main id="locks-container" class="space-y-6 pb-20"></main>
-
-    </div>
-
-    <!-- Periodic Table Modal -->
-    <div id="pt-modal" class="fixed inset-0 bg-black/90 z-40 hidden flex-col items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-panel-bg border border-neon-blue rounded-xl p-6 shadow-[0_0_30px_rgba(0,243,255,0.2)] max-w-full overflow-auto">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-2xl font-mono text-white flex items-center gap-2">
-                    <i data-lucide="map" class="text-neon-blue"></i> Mapa Interativo
-                </h3>
-                <button onclick="togglePeriodicTable()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-8 h-8"></i>
-                </button>
+            
+            <div class="progress-bar mb-10">
+                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
             </div>
-            <p id="pt-instruction" class="text-amber-400 mb-4 h-6 text-sm font-bold animate-pulse"></p>
-            <div class="overflow-x-auto pb-4">
-                <div id="pt-grid-container" class="pt-grid">
-                    <!-- Gerado via JS -->
+
+            <div id="question-container" class="flex-grow">
+                <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-8 leading-relaxed">Carregando...</h2>
+                <div id="options-grid" class="grid grid-cols-1 gap-4 mb-8">
+                    <!-- Opções -->
+                </div>
+            </div>
+
+            <div id="feedback" class="mt-auto p-6 rounded-2xl hidden">
+                <div class="flex items-start gap-4">
+                    <div id="feedback-icon" class="text-2xl"></div>
+                    <div>
+                        <p id="feedback-text" class="text-gray-700 leading-snug"></p>
+                        <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-indigo-600 text-white px-8 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">
+                            Próxima Questão →
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Victory Screen -->
-    <div id="victory-screen" class="fixed inset-0 bg-black z-50 hidden flex-col items-center justify-center p-6 text-center">
-        <i data-lucide="unlock" class="w-32 h-32 text-neon-green mb-6 animate-bounce"></i>
-        <h1 class="text-5xl md:text-7xl font-bold mb-4 font-mono text-neon-green shadow-neon-green">ACESSO TOTAL LIBERADO</h1>
-        <p class="text-xl md:text-2xl text-gray-300 max-w-2xl mb-8">
-            Parabéns! Você provou seu domínio sobre a matéria, a energia e as ligações químicas. As portas do laboratório estão abertas.
-        </p>
-        <button onclick="location.reload()" class="px-8 py-4 bg-transparent border-2 border-neon-green text-neon-green text-xl font-bold rounded hover:bg-neon-green hover:text-black transition-all duration-300">
-            JOGAR NOVAMENTE
-        </button>
+        <!-- Tela Final -->
+        <div id="end-screen" class="hidden text-center my-auto">
+            <h2 class="text-5xl font-black text-gray-800 mb-6">Resultado Final</h2>
+            <div class="relative inline-block mb-8">
+                <svg class="w-48 h-48">
+                    <circle cx="96" cy="96" r="88" stroke="#edf2f7" stroke-width="16" fill="none" />
+                    <circle id="final-circle" cx="96" cy="96" r="88" stroke="#4c51bf" stroke-width="16" fill="none" stroke-dasharray="552.92" stroke-dashoffset="552.92" transform="rotate(-90 96 96)" style="transition: stroke-dashoffset 2s ease-out" />
+                </svg>
+                <div id="final-score" class="absolute inset-0 flex items-center justify-center text-4xl font-black text-indigo-600">0%</div>
+            </div>
+            <p id="performance-msg" class="text-xl text-gray-600 mb-10 px-10"></p>
+            <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl transition shadow-xl">
+                Tentar Novamente
+            </button>
+        </div>
     </div>
-
-    <div id="toast-container"></div>
 
     <script>
-        lucide.createIcons();
+        const questions = [
+            // --- LIGAÇÕES E GEOMETRIA (1-20) ---
+            { q: "Qual é a principal motivação para os átomos realizarem ligações químicas segundo a Regra do Octeto?", options: ["Aumentar sua massa atômica", "Alcançar estabilidade eletrônica semelhante aos gases nobres", "Reduzir o número de prótons", "Ganhar energia cinética"], correct: 1, explain: "A maioria dos átomos busca ter 8 elétrons na camada de valência para atingir a configuração estável de um gás nobre.", topic: "Regra do Octeto" },
+            { q: "A ligação iônica ocorre tipicamente entre quais tipos de elementos?", options: ["Metal e Metal", "Não-metal e Não-metal", "Metal e Não-metal", "Gás Nobre e Metal"], correct: 2, explain: "Metais perdem elétrons (cátions) e ametais ganham (ânions), gerando atração eletrostática.", topic: "Ligação Iônica" },
+            { q: "Qual é a geometria molecular da água (H<sub>2</sub>O)?", options: ["Linear", "Angular", "Trigonal Plana", "Tetraédrica"], correct: 1, explain: "Os pares de elétrons não ligantes do Oxigênio repelem os pares ligantes, curvando a molécula.", topic: "VSEPR" },
+            { q: "Na ligação covalente, os elétrons são:", options: ["Transferidos permanentemente", "Perdidos para o meio", "Compartilhados entre os átomos", "Aniquilados"], correct: 2, explain: "Covalência é o compartilhamento de pares eletrônicos para estabilidade mútua.", topic: "Ligação Covalente" },
+            { q: "Qual dessas moléculas possui geometria tetraédrica?", options: ["CO<sub>2</sub>", "CH<sub>4</sub> (Metano)", "NH<sub>3</sub>", "BF<sub>3</sub>"], correct: 1, explain: "O Carbono faz 4 ligações simples simétricas, resultando em um tetraedro.", topic: "Geometria Molecular" },
+            { q: "O elemento Sódio (Z=11) ao formar uma ligação iônica tende a:", options: ["Ganhar 1 elétron", "Perder 1 elétron", "Compartilhar 2 elétrons", "Perder 7 elétrons"], correct: 1, explain: "O Na perde o único elétron da camada M para ficar com 8 na camada L.", topic: "Eletrosfera" },
+            { q: "Por que a molécula de NH<sub>3</sub> é piramidal e não trigonal plana?", options: ["Devido ao par de elétrons isolado no Nitrogênio", "Porque o Hidrogênio é muito pesado", "Porque o Nitrogênio é um metal", "Ela é trigonal plana"], correct: 0, explain: "O par isolado exerce repulsão e 'empurra' os Hidrogênios para baixo.", topic: "VSEPR" },
+            { q: "O que caracteriza uma ligação covalente polar?", options: ["Elétrons compartilhados igualmente", "Átomo mais eletronegativo atrai mais o par eletrônico", "Ocorre apenas entre metais", "Resulta sempre em molécula linear"], correct: 1, explain: "A diferença de eletronegatividade cria um dipolo elétrico na ligação.", topic: "Polaridade" },
+            { q: "Qual a geometria da molécula de Dióxido de Carbono (CO<sub>2</sub>)?", options: ["Angular", "Linear", "Piramidal", "Tetraédrica"], correct: 1, explain: "Sem elétrons isolados no Carbono, as duplas ligações ficam a 180°.", topic: "Geometria Molecular" },
+            { q: "Qual destas substâncias possui ligação iônica?", options: ["H<sub>2</sub>O", "HCl", "NaCl", "O<sub>2</sub>"], correct: 2, explain: "Metal (Na) + Ametal (Cl) = Composto Iônico clássico.", topic: "Ligações Químicas" },
+            { q: "Quantos elétrons o Cloro (Z=17) precisa para completar seu octeto?", options: ["1", "2", "7", "8"], correct: 0, explain: "Possui 7 na valência, falta apenas 1 elétron.", topic: "Regra do Octeto" },
+            { q: "O que diz a Regra do Dueto?", options: ["Átomos querem 2 prótons", "Elementos leves (H, Li, He) estabilizam-se com 2 elétrons", "Ligações só em pares", "Átomos dobram de tamanho"], correct: 1, explain: "Átomos próximos ao Hélio buscam ter apenas 2 elétrons.", topic: "Regra do Octeto" },
+            { q: "Qual a geometria do BF<sub>3</sub> (Exceção ao Octeto)?", options: ["Trigonal Plana", "Tetraédrica", "Linear", "Piramidal"], correct: 0, explain: "O Boro estabiliza com 6 elétrons, formando ângulos de 120°.", topic: "VSEPR" },
+            { q: "Ligações metálicas são descritas pelo modelo do:", options: ["Compartilhamento fixo", "Mar de elétrons", "Transferência de prótons", "Vácuo atômico"], correct: 1, explain: "Elétrons livres circulam entre cátions metálicos, garantindo condutividade.", topic: "Ligação Metálica" },
+            { q: "O composto MgCl<sub>2</sub> apresenta que tipo de ligação?", options: ["Covalente", "Iônica", "Metálica", "De Hidrogênio"], correct: 1, explain: "Transferência de elétrons do Magnésio para o Cloro.", topic: "Ligações Químicas" },
+            { q: "Uma ligação tripla envolve o compartilhamento de quantos elétrons no total?", options: ["3", "4", "6", "8"], correct: 2, explain: "3 ligações = 3 pares = 6 elétrons.", topic: "Ligação Covalente" },
+            { q: "A molécula de Metano (CH<sub>4</sub>) é polar ou apolar?", options: ["Polar", "Apolar", "Iônica", "Metálica"], correct: 1, explain: "A simetria tetraédrica anula os vetores de polaridade.", topic: "Polaridade" },
+            { q: "Ângulo aproximado em uma geometria tetraédrica perfeita?", options: ["90°", "120°", "109,5°", "180°"], correct: 2, explain: "Ângulo máximo de afastamento para 4 nuvens eletrônicas.", topic: "VSEPR" },
+            { q: "O Ozônio (O<sub>3</sub>) possui geometria:", options: ["Linear", "Angular", "Trigonal Plana", "Piramidal"], correct: 1, explain: "A nuvem eletrônica não ligante no oxigênio central distorce a forma para angular.", topic: "Geometria Molecular" },
+            { q: "Cátions são formados quando um átomo:", options: ["Ganha elétrons", "Perde elétrons", "Ganha nêutrons", "Perde prótons"], correct: 1, explain: "Perder carga negativa (elétrons) torna o átomo positivo.", topic: "Íons" },
 
-        // Dados do Jogo
-        const GAME_DATA = [
-            {
-                id: 1,
-                title: "Nível 1: Os Alicerces da Matéria",
-                desc: "Você está explorando as ruínas dos primeiros laboratórios. Decifre os modelos atômicos.",
-                locks: [
-                    { id: "1-1", type: "text", q: "Considerava o átomo como uma esfera maciça, indivisível e indestrutível, como uma bola de bilhar. Qual é o sobrenome do cientista?", a: "DALTON" },
-                    { id: "1-2", type: "drag", q: "O pudim de passas foi o primeiro modelo a apresentar natureza elétrica. Arraste a partícula subatômica que ele introduziu para a zona de análise.", options: ["PRÓTON", "ELÉTRON", "NÊUTRON", "FÓTON"], a: "ELÉTRON" },
-                    { id: "1-3", type: "text", q: "O experimento da folha de ouro bombardeada por partículas alfa revelou a existência de uma região central densa e positiva. Como se chama essa região?", a: "NUCLEO" },
-                    { id: "1-4", type: "text", q: "Qual modelo introduziu a ideia de que os elétrons giram em órbitas circulares quantizadas e com níveis de energia definidos? (Nome do cientista)", a: "BOHR" },
-                    { id: "1-5", type: "text", q: "Em 1932, a descoberta de uma partícula sem carga elétrica finalmente explicou a massa do núcleo. Qual é essa partícula?", a: "NEUTRON" },
-                    { id: "1-6", type: "select", q: "Sommerfeld refinou o modelo atômico propondo que, além de circulares, as órbitas dos elétrons também poderiam ter outro formato. Qual?", options: ["QUADRADA", "ELÍPTICA", "ESPIRAL", "TRIANGULAR"], a: "ELIPTICA" },
-                    { id: "1-7", type: "select", q: "De Broglie propôs que o elétron possui um comportamento dual. Ele se comporta tanto como partícula quanto como...", options: ["ONDA", "ENERGIA ESCURA", "RADIAÇÃO", "CALOR"], a: "ONDA" }
-                ]
-            },
-            {
-                id: 2,
-                title: "Nível 2: O Código de Acesso",
-                desc: "Hackeie os terminais de energia usando a distribuição eletrônica.",
-                locks: [
-                    { id: "2-1", type: "number", q: "Qual é o número máximo de elétrons que o subnível 'd' pode comportar?", a: "10", min: 1, max: 20 },
-                    { id: "2-2", type: "calculator", q: "Para acessar o painel, insira o número de elétrons na camada de valência do Sódio (Na, Z=11). Distribua os 11 elétrons e informe o valor da última camada.", a: "1", target: 11 },
-                    { id: "2-3", type: "text", q: "Qual elemento químico é destravado pela configuração 1s² 2s² 2p⁶ 3s² 3p⁵?", a: "CLORO" },
-                    { id: "2-4", type: "number", q: "O Ferro (Fe, Z=26) é o metal da porta blindada. Quantos elétrons ele possui em sua camada de valência (camada N)?", a: "2", min: 1, max: 8 },
-                    { id: "2-5", type: "number", q: "O Princípio de Exclusão de Pauli dita a lotação máxima de um orbital. Qual é esse número?", a: "2", min: 1, max: 10 },
-                    { id: "2-6", type: "number", q: "O subnível de energia mais complexo utilizado na tabela atual é o 'f'. Qual sua capacidade máxima de elétrons?", a: "14", min: 1, max: 20 },
-                    { id: "2-7", type: "text", q: "O gás nobre Neônio (Z=10) sela o cofre. Em qual subnível (letra e número) termina sua distribuição? (Ex: 3S2)", a: "2P6" }
-                ]
-            },
-            {
-                id: 3,
-                title: "Nível 3: O Mapa do Território",
-                desc: "Utilize o Mapa Interativo (Tabela Periódica) para localizar as coordenadas corretas.",
-                locks: [
-                    { id: "3-1", type: "select", q: "Os elementos da Família 1 (Grupo 1) reagem violentamente com a água. Como são chamados esses metais?", options: ["ALCALINOS", "ALCALINOTERROSOS", "HALOGÊNIOS", "GASES NOBRES"], a: "ALCALINOS" },
-                    { id: "3-2", type: "table", q: "Localize e clique no halogênio (Grupo 17) que se encontra no 3º período do mapa.", a: "Cl" },
-                    { id: "3-3", type: "text", q: "A propriedade periódica que mede a força com que um átomo atrai os elétrons em uma ligação é a...", a: "ELETRONEGATIVIDADE" },
-                    { id: "3-4", type: "table", q: "Encontre o 'rei' da eletronegatividade, o elemento mais ávido por elétrons de toda a tabela e clique nele no mapa.", a: "F" },
-                    { id: "3-5", type: "select", q: "Que família possui a configuração de valência completa (ns² np⁶), garantindo a eles uma estabilidade invejável (exceto o He)?", options: ["HALOGÊNIOS", "CALCOGÊNIOS", "GASES NOBRES", "METAIS DE TRANSIÇÃO"], a: "GASES NOBRES" },
-                    { id: "3-6", type: "dpad", q: "Em um grupo (coluna vertical) da tabela, para qual direção o Raio Atômico cresce?", a: "BAIXO" },
-                    { id: "3-7", type: "table", q: "Encontre a anomalia: clique no único metal que se apresenta em estado líquido à temperatura ambiente.", a: "Hg" },
-                    { id: "3-8", type: "select", q: "Os lantanídeos e actinídeos formam os metais de transição interna. A qual bloco de letras eles pertencem?", options: ["S", "P", "D", "F"], a: "F" }
-                ]
-            },
-            {
-                id: 4,
-                title: "Nível 4: A Força da União",
-                desc: "Combine os elementos e entenda suas ligações para sair definitivamente do laboratório.",
-                locks: [
-                    { id: "4-1", type: "select", q: "Ligação formada quando ocorre a transferência definitiva de elétrons, criando íons que se atraem.", options: ["METÁLICA", "IÔNICA", "COVALENTE", "PONTE DE HIDROGÊNIO"], a: "IONICA" },
-                    { id: "4-2", type: "select", q: "Quando a transferência não é opção, os átomos cooperam. O compartilhamento de pares de elétrons define qual ligação?", options: ["IÔNICA", "METÁLICA", "COVALENTE", "VAN DER WAALS"], a: "COVALENTE" },
-                    { id: "4-3", type: "select", q: "A molécula da água (H2O) não é linear devido aos pares de elétrons livres do oxigênio. Qual é a sua geometria?", options: ["LINEAR", "ANGULAR", "TRIGONAL", "TETRAÉDRICA"], a: "ANGULAR" },
-                    { id: "4-4", type: "select", q: "Um 'mar de elétrons' deslocalizados mantém os cátions unidos. Que tipo de ligação forma as engrenagens de ouro?", options: ["METÁLICA", "COVALENTE", "IÔNICA", "DATIVA"], a: "METALICA" },
-                    { id: "4-5", type: "formula", q: "Combine o Cálcio (Ca²⁺) e o Cloro (Cl⁻). Ajuste o número de átomos de Cloro necessários na fórmula para equilibrar as cargas.", a: "2" },
-                    { id: "4-6", type: "select", q: "O gás nitrogênio (N2) é extremamente forte. Quantos pares de elétrons eles precisam compartilhar?", options: ["SIMPLES", "DUPLA", "TRIPLA", "QUÁDRUPLA"], a: "TRIPLA" },
-                    { id: "4-7", type: "select", q: "Pelo modelo VSEPR, a repulsão máxima dos 4 pares de elétrons em volta do Carbono no gás metano (CH4) gera qual forma 3D?", options: ["OCTAÉDRICA", "LINEAR", "TETRAÉDRICA", "PIRAMIDAL"], a: "TETRAEDRICA" },
-                    { id: "4-8", type: "text", q: "O CADEADO FINAL. Substâncias iônicas (como o sal de cozinha) só conduzem corrente elétrica se estiverem fundidas ou em estado...", a: "AQUOSO" }
-                ]
-            }
+            // --- MOL, MASSA MOLAR E SOLUÇÕES (21-40) ---
+            { q: "O que representa a Constante de Avogadro (6,02 x 10<sup>23</sup>)?", options: ["A massa de um próton", "O número de partículas em 1 mol de qualquer substância", "A velocidade da luz no vácuo", "O número de elétrons no Oxigênio"], correct: 1, explain: "É a unidade de contagem da química, definindo o número de entidades em 1 mol.", topic: "Quantidade de Matéria" },
+            { q: "Qual a massa molar da Água (H<sub>2</sub>O)? (Dados: H=1, O=16)", options: ["17 g/mol", "18 g/mol", "10 g/mol", "32 g/mol"], correct: 1, explain: "(2x1) + 16 = 18 g/mol.", topic: "Massa Molar" },
+            { q: "Quantos mols existem em 88g de CO<sub>2</sub>? (Massa Molar do CO<sub>2</sub> = 44 g/mol)", options: ["1 mol", "2 mols", "0,5 mol", "4 mols"], correct: 1, explain: "n = m / MM -> 88 / 44 = 2 mols.", topic: "Quantidade de Matéria" },
+            { q: "Uma solução que contém a quantidade máxima de soluto que o solvente consegue dissolver a uma dada temperatura é chamada de:", options: ["Diluída", "Saturada", "Insuperável", "Concentrada"], correct: 1, explain: "Saturada atingiu o limite do coeficiente de solubilidade.", topic: "Soluções" },
+            { q: "Calcule a concentração comum (C) de uma solução com 20g de sal em 500mL de água.", options: ["10 g/L", "40 g/L", "20 g/L", "100 g/L"], correct: 1, explain: "C = m/V(L) -> 20g / 0,5L = 40 g/L.", topic: "Concentração Comum" },
+            { q: "O que acontece com a concentração de uma solução quando adicionamos apenas solvente?", options: ["Aumenta (Fica mais concentrada)", "Diminui (Ocorre diluição)", "Permanece igual", "O soluto desaparece"], correct: 1, explain: "Adicionar solvente aumenta o volume sem aumentar o soluto, diluindo a mistura.", topic: "Diluição" },
+            { q: "Qual a massa de 3 mols de Gás Oxigênio (O<sub>2</sub>)? (O=16)", options: ["32g", "48g", "96g", "16g"], correct: 2, explain: "O2 = 32 g/mol. 3 x 32 = 96g.", topic: "Massa Molar" },
+            { q: "Molaridade ou Concentração Molar (M) é expressa em que unidade?", options: ["g/L", "mol/L", "kg/mL", "mols/g"], correct: 1, explain: "Indica quantos mols de soluto existem por litro de solução.", topic: "Molaridade" },
+            { q: "Se eu tenho 1 mol de Glicose (C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>), quantas moléculas eu tenho?", options: ["180 moléculas", "6,02 x 10<sup>23</sup> moléculas", "12 moléculas", "1,2 x 10<sup>24</sup> moléculas"], correct: 1, explain: "1 mol sempre contém o número de Avogadro de partículas.", topic: "Quantidade de Matéria" },
+            { q: "Uma solução 'soro fisiológico' tem 0,9% de NaCl em massa. Isso significa que:", options: ["Há 0,9g de NaCl em 100g de solução", "Há 9g em 1L", "A solução é pura", "Há 0,9 mols em 1L"], correct: 0, explain: "Título ou porcentagem em massa indica partes de soluto por 100 partes de solução.", topic: "Concentração" },
+            { q: "Qual o volume final de uma solução se eu diluir 100mL de suco concentrado para que o volume triplique?", options: ["100mL", "200mL", "300mL", "400mL"], correct: 2, explain: "Triplicar 100mL resulta em 300mL.", topic: "Diluição" },
+            { q: "Massa de NaOH necessária para preparar 1L de solução 0,5 mol/L? (MM do NaOH = 40g/mol)", options: ["40g", "20g", "80g", "10g"], correct: 1, explain: "0,5 mol/L em 1L = 0,5 mol. m = 0,5 * 40 = 20g.", topic: "Cálculo de Soluções" },
+            { q: "O ar atmosférico é um exemplo de:", options: ["Solução gasosa", "Substância pura", "Composto iônico", "Solução sólida"], correct: 0, explain: "Mistura homogênea de gases (Nitrogênio, Oxigênio, etc).", topic: "Soluções" },
+            { q: "Densidade de uma solução é a relação entre:", options: ["Massa do soluto e Volume da solução", "Massa da solução e Volume da solução", "Massa do soluto e Massa do solvente", "Volume e Temperatura"], correct: 1, explain: "Densidade engloba a massa total (soluto + solvente).", topic: "Propriedades" },
+            { q: "Quantos átomos de Ferro existem em 1 mol de Ferro?", options: ["26 átomos", "56 átomos", "6,02 x 10<sup>23</sup> átomos", "1 átomo"], correct: 2, explain: "1 mol de elemento = 6,02 x 10^23 átomos.", topic: "Quantidade de Matéria" },
+            { q: "Se a concentração de um poluente é 1 ppm (parte por milhão), isso equivale a:", options: ["1g por Litro", "1mg por Litro (em água)", "1kg por metro", "1% da massa"], correct: 1, explain: "1mg/L em água é aproximadamente 1 parte em 1.000.000 de partes.", topic: "Unidades de Concentração" },
+            { q: "A massa molar do Ácido Sulfúrico (H<sub>2</sub>SO<sub>4</sub>) é 98 g/mol. Qual a massa de 0,1 mol?", options: ["980g", "9,8g", "0,98g", "49g"], correct: 1, explain: "0,1 * 98 = 9,8g.", topic: "Cálculo Estequiométrico" },
+            { q: "Ao preparar um refresco em pó, o pó é o ____ e a água é o ____.", options: ["Solvente / Soluto", "Soluto / Solvente", "Mistura / Reagente", "Cátion / Ânion"], correct: 1, explain: "Soluto é o que se dissolve, solvente é o que dissolve.", topic: "Soluções" },
+            { q: "Qual a molaridade de uma solução com 2 mols de soluto em 4 litros de solução?", options: ["8 mol/L", "2 mol/L", "0,5 mol/L", "4 mol/L"], correct: 2, explain: "M = n/V -> 2/4 = 0,5 mol/L.", topic: "Molaridade" },
+            { q: "O volume molar de qualquer gás nas CNTP é aproximadamente:", options: ["22,4 L", "10,0 L", "2,0 L", "100 L"], correct: 0, explain: "Nas CNTP (0°C, 1 atm), 1 mol de gás ocupa 22,4 litros.", topic: "Gases" }
         ];
 
-        // Tabela Periódica Simplificada para o Jogo (Focada nos essenciais, mas desenhando o grid)
-        const PT_ELEMENTS = [
-            {z:1,s:'H',c:1,r:1},{z:2,s:'He',c:18,r:1},
-            {z:3,s:'Li',c:1,r:2},{z:4,s:'Be',c:2,r:2},{z:5,s:'B',c:13,r:2},{z:6,s:'C',c:14,r:2},{z:7,s:'N',c:15,r:2},{z:8,s:'O',c:16,r:2},{z:9,s:'F',c:17,r:2},{z:10,s:'Ne',c:18,r:2},
-            {z:11,s:'Na',c:1,r:3},{z:12,s:'Mg',c:2,r:3},{z:13,s:'Al',c:13,r:3},{z:14,s:'Si',c:14,r:3},{z:15,s:'P',c:15,r:3},{z:16,s:'S',c:16,r:3},{z:17,s:'Cl',c:17,r:3},{z:18,s:'Ar',c:18,r:3},
-            {z:19,s:'K',c:1,r:4},{z:20,s:'Ca',c:2,r:4},{z:21,s:'Sc',c:3,r:4},{z:22,s:'Ti',c:4,r:4},{z:23,s:'V',c:5,r:4},{z:24,s:'Cr',c:6,r:4},{z:25,s:'Mn',c:7,r:4},{z:26,s:'Fe',c:8,r:4},{z:27,s:'Co',c:9,r:4},{z:28,s:'Ni',c:10,r:4},{z:29,s:'Cu',c:11,r:4},{z:30,s:'Zn',c:12,r:4},{z:31,s:'Ga',c:13,r:4},{z:32,s:'Ge',c:14,r:4},{z:33,s:'As',c:15,r:4},{z:34,s:'Se',c:16,r:4},{z:35,s:'Br',c:17,r:4},{z:36,s:'Kr',c:18,r:4},
-            {z:37,s:'Rb',c:1,r:5},{z:38,s:'Sr',c:2,r:5},{z:47,s:'Ag',c:11,r:5},{z:53,s:'I',c:17,r:5},{z:54,s:'Xe',c:18,r:5}, // Simplificado
-            {z:55,s:'Cs',c:1,r:6},{z:56,s:'Ba',c:2,r:6},{z:79,s:'Au',c:11,r:6},{z:80,s:'Hg',c:12,r:6},{z:82,s:'Pb',c:14,r:6},{z:86,s:'Rn',c:18,r:6} // Simplificado
-        ];
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
 
-        // Estado do Jogo
-        let currentState = {
-            levelIndex: 0,
-            solvedLocks: {}, // id: boolean
-            activeTableTargetId: null // Qual cadeado está esperando clique na tabela
-        };
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsGrid = document.getElementById('options-grid');
+        const feedback = document.getElementById('feedback');
+        const feedbackText = document.getElementById('feedback-text');
+        const feedbackIcon = document.getElementById('feedback-icon');
+        const counterText = document.getElementById('question-counter');
+        const topicLabel = document.getElementById('topic-label');
+        const scoreText = document.getElementById('score-display');
+        const progressFill = document.getElementById('progress-fill');
 
-        // Funções Utilitárias
-        const normalizeStr = (str) => {
-            return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
-        };
-
-        const showToast = (message, type = 'error') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            const colors = {
-                'error': 'border-neon-red text-neon-red',
-                'success': 'border-neon-green text-neon-green',
-                'info': 'border-neon-blue text-neon-blue'
-            };
-            toast.className = `toast font-mono ${colors[type]}`;
-            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'alert-triangle'}" class="inline w-5 h-5 mr-2"></i> ${message}`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            setTimeout(() => toast.remove(), 3000);
-        };
-
-        const shakeElement = (id) => {
-            const el = document.getElementById(`lock-card-${id}`);
-            if (el) {
-                el.classList.remove('shake');
-                void el.offsetWidth; // trigger reflow
-                el.classList.add('shake');
-            }
-        };
-
-        // Inicialização
         function startGame() {
-            document.getElementById('start-screen').classList.add('hidden');
-            document.getElementById('game-container').classList.remove('hidden');
-            buildPeriodicTable();
-            loadLevel(0);
+            startScreen.classList.add('hidden');
+            gameScreen.classList.remove('hidden');
+            showQuestion();
         }
 
-        function buildPeriodicTable() {
-            const container = document.getElementById('pt-grid-container');
-            container.innerHTML = '';
+        function showQuestion() {
+            answered = false;
+            feedback.classList.add('hidden');
+            optionsGrid.innerHTML = '';
             
-            // Desenhar grid 18x7 vazia inicialmente
-            for(let r=1; r<=7; r++) {
-                for(let c=1; c<=18; c++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.style.gridColumn = c;
-                    emptyCell.style.gridRow = r;
-                    container.appendChild(emptyCell);
-                }
-            }
+            const q = questions[currentQuestion];
+            questionText.innerHTML = q.q;
+            topicLabel.innerText = `Tópico: ${q.topic}`;
+            counterText.innerText = `Questão ${currentQuestion + 1} de ${questions.length}`;
+            
+            const prog = (currentQuestion / questions.length) * 100;
+            progressFill.style.width = `${prog}%`;
 
-            PT_ELEMENTS.forEach(el => {
-                const div = document.createElement('div');
-                div.className = 'pt-element rounded';
-                div.style.gridColumn = el.c;
-                div.style.gridRow = el.r;
-                div.innerHTML = `<strong>${el.s}</strong><span style="font-size: 8px; color: #888;">${el.z}</span>`;
-                div.onclick = () => handleTableClick(el.s);
-                container.appendChild(div);
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "option-btn w-full text-left p-5 rounded-2xl font-semibold text-gray-700 bg-white shadow-sm";
+                btn.innerHTML = opt;
+                btn.onclick = () => checkAnswer(index);
+                optionsGrid.appendChild(btn);
             });
         }
 
-        function togglePeriodicTable(targetId = null) {
-            const modal = document.getElementById('pt-modal');
-            const inst = document.getElementById('pt-instruction');
-            
-            if (modal.classList.contains('hidden')) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                if (targetId) {
-                    currentState.activeTableTargetId = targetId;
-                    inst.textContent = "ALVO ATIVO: Clique no elemento correto no mapa.";
-                } else {
-                    currentState.activeTableTargetId = null;
-                    inst.textContent = "";
-                }
+        function checkAnswer(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestion];
+            const buttons = optionsGrid.getElementsByTagName('button');
+
+            if (index === q.correct) {
+                buttons[index].classList.add('correct');
+                score++;
+                scoreText.innerText = `Acertos: ${score}`;
+                feedbackIcon.innerText = "⭐";
+                feedbackText.innerHTML = `<strong class="text-green-700">Resposta Correta!</strong><br>${q.explain}`;
+                feedback.className = "mt-auto p-6 rounded-2xl bg-green-50 border-2 border-green-200 block animate-pulse";
             } else {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                currentState.activeTableTargetId = null;
+                buttons[index].classList.add('wrong');
+                buttons[q.correct].classList.add('correct');
+                feedbackIcon.innerText = "💡";
+                feedbackText.innerHTML = `<strong class="text-red-700">Não foi dessa vez...</strong><br>${q.explain}`;
+                feedback.className = "mt-auto p-6 rounded-2xl bg-red-50 border-2 border-red-200 block";
             }
+
+            for (let b of buttons) b.disabled = true;
         }
 
-        function handleTableClick(symbol) {
-            if (!currentState.activeTableTargetId) return;
-            
-            const lockId = currentState.activeTableTargetId;
-            const levelData = GAME_DATA[currentState.levelIndex];
-            const lockData = levelData.locks.find(l => l.id === lockId);
-
-            if (normalizeStr(symbol) === normalizeStr(lockData.a)) {
-                markLockSolved(lockId);
-                togglePeriodicTable();
-                showToast("Coordenada correta. Acesso Liberado.", "success");
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                showQuestion();
             } else {
-                showToast(`Coordenada Incorreta: Elemento ${symbol}`, "error");
+                showEndScreen();
             }
         }
 
-        // Renderização de Nível
-        function loadLevel(index) {
-            if (index >= GAME_DATA.length) {
-                document.getElementById('game-container').classList.add('hidden');
-                document.getElementById('victory-screen').classList.remove('hidden');
-                document.getElementById('victory-screen').classList.add('flex');
-                return;
-            }
-
-            currentState.levelIndex = index;
+        function showEndScreen() {
+            gameScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
             
-            // CORREÇÃO: Resetar os cadeados resolvidos ANTES de renderizar a UI e verificar o progresso
-            currentState.solvedLocks = {};
+            const percentage = Math.round((score / questions.length) * 100);
+            const finalScoreElem = document.getElementById('final-score');
+            const finalCircle = document.getElementById('final-circle');
             
-            const data = GAME_DATA[index];
+            finalScoreElem.innerText = `${percentage}%`;
             
-            document.getElementById('level-title').textContent = data.title;
-            document.getElementById('level-desc').textContent = data.desc;
-            
-            const container = document.getElementById('locks-container');
-            container.innerHTML = '';
+            // Animação do círculo de progresso
+            const offset = 552.92 - (552.92 * percentage) / 100;
+            setTimeout(() => {
+                finalCircle.style.strokeDashoffset = offset;
+            }, 100);
 
-            data.locks.forEach((lock, i) => {
-                const card = document.createElement('div');
-                card.id = `lock-card-${lock.id}`;
-                card.className = "bg-panel-bg border border-gray-800 rounded-xl p-5 md:p-6 shadow-md transition-all duration-300 relative overflow-hidden";
-                
-                let contentHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="flex gap-3 items-center">
-                            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center font-bold text-gray-400 border border-gray-600">
-                                ${i + 1}
-                            </div>
-                            <h4 class="text-lg md:text-xl text-gray-200 pr-8">${lock.q}</h4>
-                        </div>
-                        <i data-lucide="lock" class="text-gray-600 absolute top-6 right-6" id="icon-${lock.id}"></i>
-                    </div>
-                    <div class="solved-badge font-bold text-lg mb-2">
-                        <i data-lucide="unlock"></i> DESBLOQUEADO
-                    </div>
-                    <div class="lock-interactive-area" id="area-${lock.id}">
-                `;
-
-                // Renderizar tipo específico de cadeado
-                switch(lock.type) {
-                    case 'text':
-                        contentHTML += `
-                            <div class="flex gap-2 max-w-sm">
-                                <input type="text" id="input-${lock.id}" class="input-hacker w-full px-4 py-2 rounded font-mono" placeholder="DIGITE A SENHA...">
-                                <button onclick="checkAnswer('${lock.id}', document.getElementById('input-${lock.id}').value)" class="px-4 py-2 bg-gray-800 hover:bg-neon-blue hover:text-black border border-gray-600 hover:border-neon-blue rounded transition-colors">
-                                    <i data-lucide="terminal-square"></i>
-                                </button>
-                            </div>
-                        `;
-                        break;
-                    case 'number':
-                        contentHTML += `
-                            <div class="flex gap-2 max-w-xs items-center">
-                                <input type="number" id="input-${lock.id}" class="input-hacker w-24 text-center px-4 py-2 rounded font-mono text-xl" min="${lock.min}" max="${lock.max}" value="${lock.min}">
-                                <button onclick="checkAnswer('${lock.id}', document.getElementById('input-${lock.id}').value)" class="px-6 py-2 bg-gray-800 hover:bg-neon-blue hover:text-black border border-gray-600 hover:border-neon-blue rounded transition-colors font-bold">
-                                    INJETAR
-                                </button>
-                            </div>
-                        `;
-                        break;
-                    case 'select':
-                        contentHTML += `<div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-2xl">`;
-                        lock.options.forEach(opt => {
-                            contentHTML += `
-                                <button onclick="checkAnswer('${lock.id}', '${opt}')" class="px-4 py-3 bg-gray-800 border border-gray-700 rounded hover:border-neon-blue hover:text-neon-blue transition-all text-left font-mono text-sm md:text-base">
-                                    > ${opt}
-                                </button>
-                            `;
-                        });
-                        contentHTML += `</div>`;
-                        break;
-                    case 'drag':
-                        contentHTML += `
-                            <div class="flex flex-col md:flex-row gap-6 items-center">
-                                <div class="flex flex-wrap gap-2 justify-center">
-                                    ${lock.options.map(opt => `
-                                        <div draggable="true" ondragstart="event.dataTransfer.setData('text/plain', '${opt}')" class="px-4 py-2 bg-gray-800 border border-gray-600 rounded cursor-grab active:cursor-grabbing font-mono text-sm hover:border-neon-green">
-                                            ${opt}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                                <i data-lucide="arrow-right" class="hidden md:block text-gray-600"></i>
-                                <div ondragover="event.preventDefault(); this.classList.add('drag-over')" 
-                                     ondragleave="this.classList.remove('drag-over')" 
-                                     ondrop="event.preventDefault(); this.classList.remove('drag-over'); checkAnswer('${lock.id}', event.dataTransfer.getData('text/plain'))" 
-                                     class="drop-zone w-full max-w-xs h-16 rounded flex items-center justify-center text-gray-500 font-mono">
-                                    Arraste a partícula aqui
-                                </div>
-                            </div>
-                        `;
-                        break;
-                    case 'table':
-                        contentHTML += `
-                            <button onclick="togglePeriodicTable('${lock.id}')" class="px-6 py-3 bg-indigo-900/50 border border-indigo-500 text-indigo-300 rounded hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-2 font-bold shadow-[0_0_10px_rgba(99,102,241,0.3)]">
-                                <i data-lucide="map-pin"></i> ABRIR MAPA PARA LOCALIZAR
-                            </button>
-                        `;
-                        break;
-                    case 'calculator':
-                        contentHTML += `
-                            <div class="bg-black/50 p-4 border border-gray-700 rounded max-w-md">
-                                <div class="flex justify-between items-center mb-4">
-                                    <span class="text-gray-400 text-sm">Elétrons para distribuir: <span id="calc-rem-${lock.id}" class="text-neon-blue font-bold">${lock.target}</span></span>
-                                    <button onclick="resetCalc('${lock.id}', ${lock.target})" class="text-xs text-gray-500 hover:text-white"><i data-lucide="rotate-ccw" class="w-4 h-4"></i></button>
-                                </div>
-                                <div class="flex gap-4 justify-center text-center">
-                                    <div><div class="text-xs text-gray-500">K (2)</div>
-                                         <button onclick="addElectron('${lock.id}', 'K', 2)" id="calc-k-${lock.id}" class="w-12 h-12 bg-gray-800 rounded border border-gray-600 font-mono text-xl">0</button></div>
-                                    <div><div class="text-xs text-gray-500">L (8)</div>
-                                         <button onclick="addElectron('${lock.id}', 'L', 8)" id="calc-l-${lock.id}" class="w-12 h-12 bg-gray-800 rounded border border-gray-600 font-mono text-xl">0</button></div>
-                                    <div><div class="text-xs text-gray-500">M (18)</div>
-                                         <button onclick="addElectron('${lock.id}', 'M', 18)" id="calc-m-${lock.id}" class="w-12 h-12 bg-gray-800 rounded border border-gray-600 font-mono text-xl">0</button></div>
-                                </div>
-                                <div class="mt-4 flex gap-2">
-                                    <input type="number" id="input-${lock.id}" class="input-hacker w-full px-2 py-1 rounded text-center" placeholder="Valência?">
-                                    <button onclick="checkAnswer('${lock.id}', document.getElementById('input-${lock.id}').value)" class="px-4 bg-gray-800 border border-gray-600 rounded hover:border-neon-green hover:text-neon-green"><i data-lucide="check"></i></button>
-                                </div>
-                            </div>
-                        `;
-                        break;
-                    case 'dpad':
-                        contentHTML += `
-                            <div class="grid grid-cols-3 gap-2 w-32 mx-auto md:mx-0">
-                                <div></div>
-                                <button onclick="checkAnswer('${lock.id}', 'CIMA')" class="d-pad-btn p-3 rounded flex justify-center"><i data-lucide="arrow-up"></i></button>
-                                <div></div>
-                                <button onclick="checkAnswer('${lock.id}', 'ESQUERDA')" class="d-pad-btn p-3 rounded flex justify-center"><i data-lucide="arrow-left"></i></button>
-                                <div class="flex items-center justify-center bg-gray-900 rounded"><div class="w-2 h-2 rounded-full bg-gray-600"></div></div>
-                                <button onclick="checkAnswer('${lock.id}', 'DIREITA')" class="d-pad-btn p-3 rounded flex justify-center"><i data-lucide="arrow-right"></i></button>
-                                <div></div>
-                                <button onclick="checkAnswer('${lock.id}', 'BAIXO')" class="d-pad-btn p-3 rounded flex justify-center"><i data-lucide="arrow-down"></i></button>
-                                <div></div>
-                            </div>
-                        `;
-                        break;
-                    case 'formula':
-                        contentHTML += `
-                            <div class="flex items-center gap-4 bg-black/40 p-4 rounded-lg border border-gray-700 w-fit">
-                                <div class="text-2xl font-mono px-4 py-2 bg-blue-900/30 border border-blue-500 rounded text-blue-300">Ca²⁺</div>
-                                <div class="text-xl text-gray-500">+</div>
-                                <div class="flex flex-col items-center gap-2">
-                                    <div class="text-2xl font-mono px-4 py-2 bg-green-900/30 border border-green-500 rounded text-green-300 flex items-center gap-1">
-                                        <span id="cl-count-${lock.id}">1</span> Cl⁻
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="modFormula('${lock.id}', -1)" class="w-8 h-8 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700">-</button>
-                                        <button onclick="modFormula('${lock.id}', 1)" class="w-8 h-8 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700">+</button>
-                                    </div>
-                                </div>
-                                <button onclick="checkAnswer('${lock.id}', document.getElementById('cl-count-${lock.id}').innerText)" class="ml-4 px-6 py-3 bg-neon-green/20 border border-neon-green text-neon-green rounded hover:bg-neon-green hover:text-black font-bold transition-all">SINTETIZAR</button>
-                            </div>
-                        `;
-                        break;
-                }
-
-                contentHTML += `</div>`; // Fechar lock-interactive-area
-                card.innerHTML = contentHTML;
-                container.appendChild(card);
-            });
-
-            lucide.createIcons();
-            updateProgress();
+            const msg = document.getElementById('performance-msg');
+            if (percentage === 100) msg.innerText = "Perfeito! Você dominou todos os conceitos. Nível Medicina/ITA! 🏆";
+            else if (percentage >= 80) msg.innerText = "Excelente desempenho! Você está muito bem preparado para os vestibulares. 🚀";
+            else if (percentage >= 60) msg.innerText = "Bom resultado! Você entende os conceitos básicos, mas revise os cálculos de concentração. 📊";
+            else if (percentage >= 40) msg.innerText = "Você está no caminho, mas precisa praticar mais exercícios de estequiometria e mol. 🧪";
+            else msg.innerText = "Não desanime! Química é uma matéria cumulativa. Revise a base de átomos e mols e tente novamente. 📚";
         }
-
-        // Lógicas Específicas de Interação
-        let calcStates = {};
-        function addElectron(lockId, shell, max) {
-            if (!calcStates[lockId]) calcStates[lockId] = { rem: GAME_DATA[currentState.levelIndex].locks.find(l=>l.id===lockId).target, k:0, l:0, m:0 };
-            
-            let st = calcStates[lockId];
-            let current = st[shell.toLowerCase()];
-            
-            if (st.rem > 0 && current < max) {
-                st[shell.toLowerCase()]++;
-                st.rem--;
-                document.getElementById(`calc-${shell.toLowerCase()}-${lockId}`).innerText = st[shell.toLowerCase()];
-                document.getElementById(`calc-rem-${lockId}`).innerText = st.rem;
-                document.getElementById(`calc-${shell.toLowerCase()}-${lockId}`).classList.add('border-neon-blue', 'text-neon-blue');
-                setTimeout(() => document.getElementById(`calc-${shell.toLowerCase()}-${lockId}`).classList.remove('border-neon-blue', 'text-neon-blue'), 200);
-            }
-        }
-        function resetCalc(lockId, target) {
-            calcStates[lockId] = { rem: target, k:0, l:0, m:0 };
-            document.getElementById(`calc-rem-${lockId}`).innerText = target;
-            ['k','l','m'].forEach(s => {
-                const el = document.getElementById(`calc-${s}-${lockId}`);
-                if(el) el.innerText = '0';
-            });
-        }
-
-        function modFormula(lockId, val) {
-            const el = document.getElementById(`cl-count-${lockId}`);
-            let curr = parseInt(el.innerText);
-            curr += val;
-            if(curr < 1) curr = 1;
-            if(curr > 5) curr = 5;
-            el.innerText = curr;
-        }
-
-        // Validação Central
-        function checkAnswer(lockId, answer) {
-            if (!answer) return;
-            
-            const levelData = GAME_DATA[currentState.levelIndex];
-            const lockData = levelData.locks.find(l => l.id === lockId);
-            
-            const normalizedInput = normalizeStr(String(answer));
-            const normalizedAnswer = normalizeStr(String(lockData.a));
-
-            if (normalizedInput === normalizedAnswer) {
-                markLockSolved(lockId);
-            } else {
-                shakeElement(lockId);
-                showToast("Acesso Negado. Tente novamente.", "error");
-            }
-        }
-
-        function markLockSolved(lockId) {
-            if (currentState.solvedLocks[lockId]) return; // Já resolvido
-            
-            currentState.solvedLocks[lockId] = true;
-            
-            const card = document.getElementById(`lock-card-${lockId}`);
-            const area = document.getElementById(`area-${lockId}`);
-            const icon = document.getElementById(`icon-${lockId}`);
-            
-            card.classList.add('solved-card');
-            area.style.display = 'none';
-            icon.setAttribute('data-lucide', 'unlock');
-            icon.classList.remove('text-gray-600');
-            icon.classList.add('text-neon-green');
-            
-            lucide.createIcons();
-            showToast("Cadeado Desbloqueado!", "success");
-            
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const levelData = GAME_DATA[currentState.levelIndex];
-            const total = levelData.locks.length;
-            const solvedCount = Object.keys(currentState.solvedLocks).length;
-            
-            const percentage = (solvedCount / total) * 100;
-            document.getElementById('progress-bar').style.width = `${percentage}%`;
-            document.getElementById('progress-text').textContent = `${solvedCount}/${total}`;
-
-            if (solvedCount === total) {
-                setTimeout(() => {
-                    showToast("NÍVEL CONCLUÍDO. INICIANDO PRÓXIMA FASE...", "info");
-                    setTimeout(() => {
-                        loadLevel(currentState.levelIndex + 1);
-                    }, 2000);
-                }, 500);
-            }
-        }
-
-        // Permitir envio de input de texto com Enter
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && e.target.tagName === 'INPUT' && e.target.type === 'text') {
-                const lockId = e.target.id.replace('input-', '');
-                checkAnswer(lockId, e.target.value);
-            }
-        });
-
     </script>
 </body>
 </html>
