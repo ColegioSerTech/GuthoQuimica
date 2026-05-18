@@ -1,297 +1,1839 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Master Química - Desafio Vestibular</title>
+    <title>BioQuest Vestibulares: Missão 2° EM</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            padding: 20px;
-            color: #2d3748;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b131a;
+            color: #f3f4f6;
         }
-
-        .glass-card {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 900px;
-            min-height: 600px;
-            display: flex;
-            flex-direction: column;
+        .glass {
+            background: rgba(17, 27, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 2px solid #edf2f7;
+        .glow-green {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
         }
-
-        .option-btn:hover:not(:disabled) {
-            border-color: #4c51bf;
-            background-color: #f7fafc;
-            transform: translateX(10px);
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
         }
-
-        .correct {
-            background-color: #c6f6d5 !important;
-            border-color: #48bb78 !important;
-            color: #22543d !important;
+        /* Estilos de transição suaves */
+        .page-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
-        .wrong {
-            background-color: #fed7d7 !important;
-            border-color: #f56565 !important;
-            color: #742a2a !important;
+        /* Custom drag state */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
         }
-
-        .progress-bar {
-            height: 10px;
-            background-color: #edf2f7;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            transition: width 0.4s ease;
-        }
-
-        sub { bottom: -0.25em; font-size: 0.75em; }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <div class="glass-card p-8 md:p-12">
-        <!-- Tela Inicial -->
-        <div id="start-screen" class="text-center my-auto">
-            <div class="mb-6 inline-block p-4 bg-indigo-100 rounded-full">
-                <span class="text-5xl">🔬</span>
+    <!-- Header do Jogo -->
+    <header class="glass sticky top-0 z-50 px-6 py-4 border-b border-gray-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500/20 p-2.5 rounded-xl border border-emerald-500/30 text-emerald-400">
+                    <i data-lucide="dna" class="w-8 h-8 animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                        BIOQUEST <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">2° EM</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Vestibulares & Medicina</p>
+                </div>
             </div>
-            <h1 class="text-4xl font-black text-gray-800 mb-4 tracking-tight">Master Química: 2º Ano EM</h1>
-            <p class="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-                Prepare-se para o vestibular! Enfrente 40 questões sobre Ligações Químicas, Geometria, Mol e Concentração de Soluções.
-            </p>
-            <button onclick="startGame()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl text-xl shadow-lg transition transform hover:-translate-y-1">
-                Iniciar Grande Desafio
-            </button>
-            <div class="mt-10 grid grid-cols-2 gap-4 text-sm text-gray-500 font-medium">
-                <div class="p-3 bg-gray-50 rounded-lg">Módulo 1: Ligações & VSEPR</div>
-                <div class="p-3 bg-gray-50 rounded-lg">Módulo 2: Mol & Soluções</div>
+
+            <!-- Placar de progresso geral -->
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+                    <i data-lucide="star" class="w-4 h-4 text-amber-400 fill-amber-400"></i>
+                    <span class="font-bold text-gray-300">Pontos: <span id="global-score" class="text-amber-400">0</span></span>
+                </div>
+                <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800">
+                    <i data-lucide="award" class="w-4 h-4 text-emerald-400"></i>
+                    <span class="font-bold text-gray-300">Progresso: <span id="global-progress" class="text-emerald-400">0/55</span> Q</span>
+                </div>
+                <button id="btn-mutar" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all" title="Alternar som">
+                    <i id="icone-som" data-lucide="volume-2" class="w-4 h-4 text-gray-300"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTAINER PRINCIPAL DE TELAS -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 md:px-6 py-8">
+        
+        <!-- TELA 1: HOME/MAPA DO JOGO -->
+        <div id="tela-home" class="page-transition">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-4">
+                    Domine a Biologia Celular e Vegetal!
+                </h2>
+                <p class="text-gray-400 text-base md:text-lg leading-relaxed">
+                    Selecione uma missão abaixo. Cada tópico contém <span class="text-emerald-400 font-semibold">11 questões minuciosas do nível dos vestibulares mais concorridos</span>, além de desafios dinâmicos de arrastar e clicar para fixação!
+                </p>
+            </div>
+
+            <!-- Mapa das Missões -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                
+                <!-- TÓPICO 1 -->
+                <div class="glass p-6 rounded-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-emerald-500/20">Missão 1</span>
+                            <span class="text-gray-500 text-xs font-semibold">11 Questões</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">A Folha e a Fotossíntese</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Estudo anatômico dos estômatos, parênquimas foliares, transpiração e os fatores limitantes da fotossíntese.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800/60 flex items-center justify-between">
+                        <span id="prog-topico-1" class="text-xs text-slate-400 font-semibold">Não Iniciado (0/11)</span>
+                        <button onclick="iniciarTopico(1)" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Jogar <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TÓPICO 2 -->
+                <div class="glass p-6 rounded-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-emerald-500/20">Missão 2</span>
+                            <span class="text-gray-500 text-xs font-semibold">11 Questões</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">A Química da Fotossíntese</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Fases fotoquímica e química (Ciclo de Calvin), fotólise da água, fosforilação e a importância dos pigmentos acessórios.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800/60 flex items-center justify-between">
+                        <span id="prog-topico-2" class="text-xs text-slate-400 font-semibold">Não Iniciado (0/11)</span>
+                        <button onclick="iniciarTopico(2)" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Jogar <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TÓPICO 3 -->
+                <div class="glass p-6 rounded-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-emerald-500/20">Missão 3</span>
+                            <span class="text-gray-500 text-xs font-semibold">11 Questões</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Fotossíntese Bacteriana e Quimiossíntese</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Uso de compostos como $H_2S$, quimiossíntese de nitrificantes do solo, ecologia e bioenergética de procariontes.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800/60 flex items-center justify-between">
+                        <span id="prog-topico-3" class="text-xs text-slate-400 font-semibold">Não Iniciado (0/11)</span>
+                        <button onclick="iniciarTopico(3)" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Jogar <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TÓPICO 4 -->
+                <div class="glass p-6 rounded-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-emerald-500/20">Missão 4</span>
+                            <span class="text-gray-500 text-xs font-semibold">11 Questões</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">A Ação Gênica</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Dogma central da biologia molecular. Processos moleculares de replicação, transcrição e o splicing pós-transcricional.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800/60 flex items-center justify-between">
+                        <span id="prog-topico-4" class="text-xs text-slate-400 font-semibold">Não Iniciado (0/11)</span>
+                        <button onclick="iniciarTopico(4)" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Jogar <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- TÓPICO 5 -->
+                <div class="glass p-6 rounded-2xl hover:border-emerald-500/40 transition-all duration-300 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-emerald-500/10 text-emerald-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-emerald-500/20">Missão 5</span>
+                            <span class="text-gray-500 text-xs font-semibold">11 Questões</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">O Código Genético</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">A universalidade e degeneração do código, códons de início/fim, papel dos ribossomos, mutações gênicas e síntese proteica.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-slate-800/60 flex items-center justify-between">
+                        <span id="prog-topico-5" class="text-xs text-slate-400 font-semibold">Não Iniciado (0/11)</span>
+                        <button onclick="iniciarTopico(5)" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-bold px-4 py-2 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Jogar <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DESAFIOS INTERATIVOS EXTRAS (LABS PRÁTICOS) -->
+                <div class="border-2 border-dashed border-cyan-500/40 bg-cyan-950/20 p-6 rounded-2xl flex flex-col justify-between group">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="bg-cyan-500/15 text-cyan-300 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider border border-cyan-500/30">Laboratórios Práticos</span>
+                            <span class="text-cyan-400 text-xs font-bold animate-pulse">Atividades Extras</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">Laboratórios Interativos</h3>
+                        <p class="text-sm text-gray-400 mb-4 leading-relaxed">Aprenda na prática! Monte as fases da Fotossíntese e sintetize polipeptídeos ligando Códons a Anticódons com dinâmicas de arrastar e clicar.</p>
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-cyan-900/40 flex flex-col sm:flex-row gap-2">
+                        <button onclick="abrirLab(1)" class="w-full text-center bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="beaker" class="w-3.5 h-3.5"></i> Lab de Tradução
+                        </button>
+                        <button onclick="abrirLab(2)" class="w-full text-center bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5">
+                            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i> Lab de Fotossíntese
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Botão Ver Resultados e Instruções -->
+            <div class="flex flex-col md:flex-row gap-6 max-w-4xl mx-auto">
+                <div class="glass p-6 rounded-2xl flex-1 flex items-center gap-4">
+                    <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-white text-sm">Metodologia Ativa de Estudo</h4>
+                        <p class="text-xs text-gray-400 mt-1">Ao errar, o jogo fornecerá feedbacks científicos robustos contendo os termos mais cobrados nos exames de ingresso ao ensino superior.</p>
+                    </div>
+                </div>
+                <div class="glass p-6 rounded-2xl flex-1 flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="p-3 bg-blue-500/10 rounded-xl text-blue-400 border border-blue-500/20">
+                            <i data-lucide="bar-chart-3" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-sm">Painel de Métricas Vestibulares</h4>
+                            <p class="text-xs text-gray-400 mt-1">Veja seu nível de acertos e determine onde reforçar os estudos.</p>
+                        </div>
+                    </div>
+                    <button onclick="mostrarResultadosFinais()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold px-4 py-3 rounded-xl transition-all h-fit whitespace-nowrap">
+                        Ver Estatísticas
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- Tela de Jogo -->
-        <div id="game-screen" class="hidden flex-grow flex flex-col">
-            <div class="flex justify-between items-end mb-4">
-                <div>
-                    <p id="question-counter" class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Questão 1 de 40</p>
-                    <h3 id="topic-label" class="text-sm text-gray-400">Tópico: Ligações Químicas</h3>
+        <!-- TELA 2: QUESTIONÁRIO DA MISSÃO ATIVA -->
+        <div id="tela-quiz" class="hidden page-transition">
+            <div class="max-w-4xl mx-auto">
+                <!-- Cabeçalho do Quiz -->
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="voltarParaHome()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700/60 transition-all">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Abandonar Missão
+                    </button>
+                    <div class="text-right">
+                        <span id="quiz-badge-topico" class="bg-emerald-500/15 text-emerald-400 text-xs px-3 py-1 rounded-full font-bold border border-emerald-500/20">Tópico 1</span>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <span id="score-display" class="text-lg font-bold text-gray-800">Acertos: 0</span>
-                </div>
-            </div>
-            
-            <div class="progress-bar mb-10">
-                <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
-            </div>
 
-            <div id="question-container" class="flex-grow">
-                <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-8 leading-relaxed">Carregando...</h2>
-                <div id="options-grid" class="grid grid-cols-1 gap-4 mb-8">
-                    <!-- Opções -->
+                <!-- Barra de progresso interna do tópico -->
+                <div class="mb-6">
+                    <div class="flex justify-between text-xs text-gray-400 mb-2">
+                        <span>Questão <span id="quiz-num-atual" class="text-white font-bold">1</span> de 11</span>
+                        <span>Acertos neste tópico: <span id="quiz-acertos-topico" class="text-emerald-400 font-bold">0</span></span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                        <div id="quiz-progresso-barra" class="bg-gradient-to-r from-emerald-500 to-cyan-500 h-full w-0 transition-all duration-300"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="feedback" class="mt-auto p-6 rounded-2xl hidden">
-                <div class="flex items-start gap-4">
-                    <div id="feedback-icon" class="text-2xl"></div>
-                    <div>
-                        <p id="feedback-text" class="text-gray-700 leading-snug"></p>
-                        <button id="next-btn" onclick="nextQuestion()" class="mt-4 bg-indigo-600 text-white px-8 py-2 rounded-xl font-bold hover:bg-indigo-700 transition">
-                            Próxima Questão →
+                <!-- Card de Pergunta -->
+                <div class="glass p-6 md:p-8 rounded-2xl mb-6 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 bg-emerald-500 h-full"></div>
+                    <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold uppercase tracking-wider mb-3">
+                        <i data-lucide="help-circle" class="w-4 h-4"></i> Enunciado Teórico de Vestibular
+                    </div>
+                    <h3 id="quiz-enunciado" class="text-lg md:text-xl font-bold text-white leading-relaxed mb-6">
+                        Carregando pergunta...
+                    </h3>
+
+                    <!-- Opções de Resposta -->
+                    <div id="quiz-opcoes" class="grid grid-cols-1 gap-4">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+
+                <!-- Box de Feedback -->
+                <div id="quiz-feedback-box" class="hidden glass p-6 rounded-2xl border-l-4 mb-6 transition-all duration-300 animate-fadeIn">
+                    <div class="flex items-start gap-3">
+                        <div id="quiz-feedback-icon" class="p-2 rounded-lg"></div>
+                        <div>
+                            <h4 id="quiz-feedback-titulo" class="font-extrabold text-white text-base">Feedback</h4>
+                            <p id="quiz-feedback-texto" class="text-gray-300 text-sm mt-2 leading-relaxed">Explicação científica.</p>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button id="quiz-btn-proxima" class="bg-emerald-500 hover:bg-emerald-600 text-slate-900 font-extrabold px-6 py-2.5 rounded-xl text-sm transition-all flex items-center gap-1.5 shadow-lg shadow-emerald-500/10">
+                            Próxima Questão <i data-lucide="chevron-right" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tela Final -->
-        <div id="end-screen" class="hidden text-center my-auto">
-            <h2 class="text-5xl font-black text-gray-800 mb-6">Resultado Final</h2>
-            <div class="relative inline-block mb-8">
-                <svg class="w-48 h-48">
-                    <circle cx="96" cy="96" r="88" stroke="#edf2f7" stroke-width="16" fill="none" />
-                    <circle id="final-circle" cx="96" cy="96" r="88" stroke="#4c51bf" stroke-width="16" fill="none" stroke-dasharray="552.92" stroke-dashoffset="552.92" transform="rotate(-90 96 96)" style="transition: stroke-dashoffset 2s ease-out" />
-                </svg>
-                <div id="final-score" class="absolute inset-0 flex items-center justify-center text-4xl font-black text-indigo-600">0%</div>
+        <!-- TELA 3: LABORATÓRIO 1 - TRADUÇÃO (SÍNTESE DE PROTEÍNAS) -->
+        <div id="tela-lab-traducao" class="hidden page-transition">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="voltarParaHome()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700/60 transition-all">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Menu
+                    </button>
+                    <div class="bg-cyan-500/15 text-cyan-300 text-xs px-3 py-1 rounded-full font-bold border border-cyan-500/20">
+                        Laboratório 1: Tradução e Pareamento de Códons
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl mb-8">
+                    <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        <i data-lucide="beaker" class="text-cyan-400"></i> Síntese Proteica Ribossômica
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                        Durante a tradução no ribossomo, o <span class="text-cyan-400 font-semibold">anticódon</span> do RNAt carrega um aminoácido específico e se liga de forma complementar ao <span class="text-emerald-400 font-semibold">códon</span> do RNAm. <br>
+                        <strong>Como jogar:</strong> Clique em um <span class="text-cyan-400 font-semibold">Anticódon (RNAt)</span> da fileira inferior e, em seguida, clique no <span class="text-emerald-400 font-semibold">Códon (RNAm)</span> correspondente (emparelhamento clássico: A=U, C=G). Complete a fita de proteína!
+                    </p>
+
+                    <!-- Painel do Ribossomo -->
+                    <div class="bg-slate-900/90 rounded-xl p-6 border border-slate-800 min-h-[300px] flex flex-col justify-around gap-6 relative">
+                        <div class="absolute -top-3 left-6 bg-cyan-500/20 border border-cyan-500/30 text-cyan-300 text-xs px-2 py-0.5 rounded uppercase font-bold tracking-widest">Ribossomo (Subunidade Maior/Menor)</div>
+
+                        <!-- Cadeia Polipeptídica (Crescendo) -->
+                        <div>
+                            <p class="text-xs text-slate-500 mb-2 font-bold uppercase tracking-widest">Proteína Formada (Cadeia de Aminoácidos):</p>
+                            <div id="lab-proteina-construcao" class="flex flex-wrap items-center gap-2 min-h-[50px] bg-slate-950/40 p-3 rounded-lg border border-dashed border-slate-800">
+                                <!-- Preenchido dinamicamente com aminoácidos ligados -->
+                                <span class="text-xs text-slate-500 italic">Ligue os RNAts aos RNAms para sintetizar a proteína...</span>
+                            </div>
+                        </div>
+
+                        <!-- Fita de RNA Mensageiro (Códons) -->
+                        <div>
+                            <p class="text-xs text-emerald-400 mb-2 font-bold uppercase tracking-widest">Códons de RNAm no Ribossomo:</p>
+                            <div id="lab-codons-container" class="grid grid-cols-4 gap-4">
+                                <!-- Gerado via JS: Códons ativos -->
+                            </div>
+                        </div>
+
+                        <!-- Pool de RNA Transportador (Anticódons para clicar) -->
+                        <div>
+                            <p class="text-xs text-cyan-400 mb-2 font-bold uppercase tracking-widest">Anticódons dos RNAt Disponíveis no Citoplasma:</p>
+                            <div id="lab-anticodons-container" class="grid grid-cols-4 gap-4">
+                                <!-- Gerado via JS: Anticódons -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de Sucesso -->
+                    <div id="lab-traducao-sucesso" class="hidden mt-6 bg-cyan-950/40 border border-cyan-500/40 p-4 rounded-xl text-center">
+                        <p class="text-sm text-cyan-300 font-bold mb-3">Parabéns! Cadeia Polipeptídica de 4 aminoácidos sintetizada com sucesso!</p>
+                        <button onclick="reiniciarLabTraducao()" class="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-extrabold px-4 py-2 rounded-lg text-xs transition-all">Sintetizar Nova Proteína</button>
+                    </div>
+                </div>
             </div>
-            <p id="performance-msg" class="text-xl text-gray-600 mb-10 px-10"></p>
-            <button onclick="location.reload()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-2xl transition shadow-xl">
-                Tentar Novamente
-            </button>
         </div>
-    </div>
 
+        <!-- TELA 4: LABORATÓRIO 2 - FOTOSSÍNTESE (CLASSIFICAÇÃO DINÂMICA) -->
+        <div id="tela-lab-fotosintese" class="hidden page-transition">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="voltarParaHome()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700/60 transition-all">
+                        <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Menu
+                    </button>
+                    <div class="bg-cyan-500/15 text-cyan-300 text-xs px-3 py-1 rounded-full font-bold border border-cyan-500/20">
+                        Laboratório 2: Quimiotaxia e Bioquímica Cloroplastidial
+                    </div>
+                </div>
+
+                <div class="glass p-6 rounded-2xl mb-8">
+                    <h3 class="text-xl font-bold text-white mb-2 flex items-center gap-2">
+                        <i data-lucide="shuffle" class="text-cyan-400"></i> Dinâmica da Fotossíntese: Fase Clara vs. Escura
+                    </h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                        A fotossíntese é composta por duas etapas: a <strong>Fase Fotoquímica (Clara)</strong> que ocorre nos Tilacoides e a <strong>Fase Química (Escura)</strong> que ocorre no Estroma. <br>
+                        <strong>Como jogar:</strong> <span class="text-white">Clique</span> em um componente no painel de "Elementos Químicos" e em seguida <span class="text-white">clique</span> na zona de destino adequada (Estroma ou Tilacoide) para movê-lo. Se preferir, você também pode simplesmente arrastar e soltar (Drag and Drop)!
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Lado Esquerdo: Elementos a serem distribuídos -->
+                        <div class="bg-slate-900/85 p-5 rounded-2xl border border-slate-800 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-extrabold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                                    <i data-lucide="package-open" class="w-4 h-4"></i> Elementos Químicos
+                                </h4>
+                                <p class="text-xs text-slate-400 mb-4">Escolha um elemento para classificar:</p>
+                                <div id="lab-elementos-pool" class="grid grid-cols-2 gap-3 min-h-[220px]">
+                                    <!-- Gerado dinamicamente via JS -->
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-slate-800/60 text-center">
+                                <button onclick="reiniciarLabFotosintese()" class="text-slate-400 hover:text-white text-xs underline transition-all">Reiniciar Desafio</button>
+                            </div>
+                        </div>
+
+                        <!-- Lado Direito: Áreas de destino (Cloroplasto) -->
+                        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Destino A: Fase Clara / Tilacoide -->
+                            <div id="zona-tilacoide" class="border-2 border-dashed border-emerald-500/30 bg-emerald-950/10 p-5 rounded-2xl flex flex-col justify-between min-h-[300px] transition-colors duration-200" ondragover="permitirDrop(event)" ondrop="realizarDrop(event, 'tilacoide')">
+                                <div>
+                                    <h4 class="text-sm font-black text-emerald-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                        <i data-lucide="sun" class="w-4 h-4"></i> Fase Fotoquímica
+                                    </h4>
+                                    <span class="text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded font-bold uppercase">Nos Tilacoides</span>
+                                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">Etapa dependente de luz, focada na quebra de água e carregamento energético.</p>
+                                </div>
+                                <div id="zona-tilacoide-conteudo" class="grid grid-cols-2 gap-2 mt-4 min-h-[160px] bg-slate-950/40 p-3 rounded-xl border border-dashed border-slate-800">
+                                    <!-- Elementos soltos aqui -->
+                                </div>
+                            </div>
+
+                            <!-- Destino B: Fase Escura / Estroma -->
+                            <div id="zona-estroma" class="border-2 border-dashed border-amber-500/30 bg-amber-950/10 p-5 rounded-2xl flex flex-col justify-between min-h-[300px] transition-colors duration-200" ondragover="permitirDrop(event)" ondrop="realizarDrop(event, 'estroma')">
+                                <div>
+                                    <h4 class="text-sm font-black text-amber-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                                        <i data-lucide="moon" class="w-4 h-4"></i> Fase Química
+                                    </h4>
+                                    <span class="text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/20 px-2 py-0.5 rounded font-bold uppercase">No Estroma (Ciclo de Calvin)</span>
+                                    <p class="text-xs text-slate-400 mt-2 leading-relaxed">Etapa de fixação de carbono inorgânico para produção de glicídios energéticos.</p>
+                                </div>
+                                <div id="zona-estroma-conteudo" class="grid grid-cols-2 gap-2 mt-4 min-h-[160px] bg-slate-950/40 p-3 rounded-xl border border-dashed border-slate-800">
+                                    <!-- Elementos soltos aqui -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensagem de Sucesso e Pontuação -->
+                    <div id="lab-fotosintese-feedback" class="hidden mt-6 bg-slate-900/90 border border-slate-800 p-4 rounded-xl text-center">
+                        <p id="lab-fotosintese-feedback-texto" class="text-sm font-bold mb-2">Classificou todos os elementos!</p>
+                        <p class="text-xs text-gray-400">Verifique seus acertos acima para continuar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TELA 5: PAINEL DE RESULTADOS E ESTATÍSTICAS -->
+        <div id="tela-resultados" class="hidden page-transition">
+            <div class="max-w-4xl mx-auto glass p-6 md:p-8 rounded-2xl">
+                <div class="text-center mb-8">
+                    <div class="inline-flex p-4 bg-emerald-500/10 text-emerald-400 rounded-2xl border border-emerald-500/20 mb-4">
+                        <i data-lucide="trophy" class="w-12 h-12"></i>
+                    </div>
+                    <h3 class="text-2xl md:text-3xl font-extrabold text-white">Análise de Rendimento Geral</h3>
+                    <p class="text-sm text-gray-400 mt-1">Veja seus acertos e nível de prontidão para as provas de vestibular</p>
+                </div>
+
+                <!-- Estatísticas Principais -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider block mb-1">Total de Acertos</span>
+                        <span id="res-total-acertos" class="text-2xl md:text-3xl font-bold text-emerald-400">0 / 55</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider block mb-1">Aproveitamento</span>
+                        <span id="res-porcentagem" class="text-2xl md:text-3xl font-bold text-cyan-400">0%</span>
+                    </div>
+                    <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 text-center">
+                        <span class="text-xs text-slate-400 uppercase tracking-wider block mb-1">Status de Prontidão</span>
+                        <span id="res-nivel" class="text-base font-bold text-amber-400 block mt-2">Em treinamento</span>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Desempenho por Tópico (Gerado dinamicamente com SVG) -->
+                <div class="bg-slate-900/80 p-6 rounded-xl border border-slate-800 mb-8">
+                    <h4 class="text-sm font-bold text-slate-200 mb-4 uppercase tracking-wider">Pontuação Absoluta por Tópico (Meta: 11 pontos cada)</h4>
+                    <div id="res-grafico-container" class="space-y-4">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
+
+                <!-- Opções de Ação -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-between pt-6 border-t border-slate-800">
+                    <button onclick="voltarParaHome()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i> Voltar ao Mapa de Missões
+                    </button>
+                    <button onclick="reiniciarTudo()" class="bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-slate-950 font-black px-6 py-3 rounded-xl transition-all text-sm flex items-center justify-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Resetar Todo o Progresso
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 border-t border-slate-900 bg-slate-950/40 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>&copy; 2026 - BioQuest Vestibulares. Desenvolvido para máxima performance em Biologia do 2° ano do Ensino Médio.</p>
+        </div>
+    </footer>
+
+    <!-- BANCO DE QUESTÕES SCRIPT -->
     <script>
-        const questions = [
-            // --- LIGAÇÕES E GEOMETRIA (1-20) ---
-            { q: "Qual é a principal motivação para os átomos realizarem ligações químicas segundo a Regra do Octeto?", options: ["Aumentar sua massa atômica", "Alcançar estabilidade eletrônica semelhante aos gases nobres", "Reduzir o número de prótons", "Ganhar energia cinética"], correct: 1, explain: "A maioria dos átomos busca ter 8 elétrons na camada de valência para atingir a configuração estável de um gás nobre.", topic: "Regra do Octeto" },
-            { q: "A ligação iônica ocorre tipicamente entre quais tipos de elementos?", options: ["Metal e Metal", "Não-metal e Não-metal", "Metal e Não-metal", "Gás Nobre e Metal"], correct: 2, explain: "Metais perdem elétrons (cátions) e ametais ganham (ânions), gerando atração eletrostática.", topic: "Ligação Iônica" },
-            { q: "Qual é a geometria molecular da água (H<sub>2</sub>O)?", options: ["Linear", "Angular", "Trigonal Plana", "Tetraédrica"], correct: 1, explain: "Os pares de elétrons não ligantes do Oxigênio repelem os pares ligantes, curvando a molécula.", topic: "VSEPR" },
-            { q: "Na ligação covalente, os elétrons são:", options: ["Transferidos permanentemente", "Perdidos para o meio", "Compartilhados entre os átomos", "Aniquilados"], correct: 2, explain: "Covalência é o compartilhamento de pares eletrônicos para estabilidade mútua.", topic: "Ligação Covalente" },
-            { q: "Qual dessas moléculas possui geometria tetraédrica?", options: ["CO<sub>2</sub>", "CH<sub>4</sub> (Metano)", "NH<sub>3</sub>", "BF<sub>3</sub>"], correct: 1, explain: "O Carbono faz 4 ligações simples simétricas, resultando em um tetraedro.", topic: "Geometria Molecular" },
-            { q: "O elemento Sódio (Z=11) ao formar uma ligação iônica tende a:", options: ["Ganhar 1 elétron", "Perder 1 elétron", "Compartilhar 2 elétrons", "Perder 7 elétrons"], correct: 1, explain: "O Na perde o único elétron da camada M para ficar com 8 na camada L.", topic: "Eletrosfera" },
-            { q: "Por que a molécula de NH<sub>3</sub> é piramidal e não trigonal plana?", options: ["Devido ao par de elétrons isolado no Nitrogênio", "Porque o Hidrogênio é muito pesado", "Porque o Nitrogênio é um metal", "Ela é trigonal plana"], correct: 0, explain: "O par isolado exerce repulsão e 'empurra' os Hidrogênios para baixo.", topic: "VSEPR" },
-            { q: "O que caracteriza uma ligação covalente polar?", options: ["Elétrons compartilhados igualmente", "Átomo mais eletronegativo atrai mais o par eletrônico", "Ocorre apenas entre metais", "Resulta sempre em molécula linear"], correct: 1, explain: "A diferença de eletronegatividade cria um dipolo elétrico na ligação.", topic: "Polaridade" },
-            { q: "Qual a geometria da molécula de Dióxido de Carbono (CO<sub>2</sub>)?", options: ["Angular", "Linear", "Piramidal", "Tetraédrica"], correct: 1, explain: "Sem elétrons isolados no Carbono, as duplas ligações ficam a 180°.", topic: "Geometria Molecular" },
-            { q: "Qual destas substâncias possui ligação iônica?", options: ["H<sub>2</sub>O", "HCl", "NaCl", "O<sub>2</sub>"], correct: 2, explain: "Metal (Na) + Ametal (Cl) = Composto Iônico clássico.", topic: "Ligações Químicas" },
-            { q: "Quantos elétrons o Cloro (Z=17) precisa para completar seu octeto?", options: ["1", "2", "7", "8"], correct: 0, explain: "Possui 7 na valência, falta apenas 1 elétron.", topic: "Regra do Octeto" },
-            { q: "O que diz a Regra do Dueto?", options: ["Átomos querem 2 prótons", "Elementos leves (H, Li, He) estabilizam-se com 2 elétrons", "Ligações só em pares", "Átomos dobram de tamanho"], correct: 1, explain: "Átomos próximos ao Hélio buscam ter apenas 2 elétrons.", topic: "Regra do Octeto" },
-            { q: "Qual a geometria do BF<sub>3</sub> (Exceção ao Octeto)?", options: ["Trigonal Plana", "Tetraédrica", "Linear", "Piramidal"], correct: 0, explain: "O Boro estabiliza com 6 elétrons, formando ângulos de 120°.", topic: "VSEPR" },
-            { q: "Ligações metálicas são descritas pelo modelo do:", options: ["Compartilhamento fixo", "Mar de elétrons", "Transferência de prótons", "Vácuo atômico"], correct: 1, explain: "Elétrons livres circulam entre cátions metálicos, garantindo condutividade.", topic: "Ligação Metálica" },
-            { q: "O composto MgCl<sub>2</sub> apresenta que tipo de ligação?", options: ["Covalente", "Iônica", "Metálica", "De Hidrogênio"], correct: 1, explain: "Transferência de elétrons do Magnésio para o Cloro.", topic: "Ligações Químicas" },
-            { q: "Uma ligação tripla envolve o compartilhamento de quantos elétrons no total?", options: ["3", "4", "6", "8"], correct: 2, explain: "3 ligações = 3 pares = 6 elétrons.", topic: "Ligação Covalente" },
-            { q: "A molécula de Metano (CH<sub>4</sub>) é polar ou apolar?", options: ["Polar", "Apolar", "Iônica", "Metálica"], correct: 1, explain: "A simetria tetraédrica anula os vetores de polaridade.", topic: "Polaridade" },
-            { q: "Ângulo aproximado em uma geometria tetraédrica perfeita?", options: ["90°", "120°", "109,5°", "180°"], correct: 2, explain: "Ângulo máximo de afastamento para 4 nuvens eletrônicas.", topic: "VSEPR" },
-            { q: "O Ozônio (O<sub>3</sub>) possui geometria:", options: ["Linear", "Angular", "Trigonal Plana", "Piramidal"], correct: 1, explain: "A nuvem eletrônica não ligante no oxigênio central distorce a forma para angular.", topic: "Geometria Molecular" },
-            { q: "Cátions são formados quando um átomo:", options: ["Ganha elétrons", "Perde elétrons", "Ganha nêutrons", "Perde prótons"], correct: 1, explain: "Perder carga negativa (elétrons) torna o átomo positivo.", topic: "Íons" },
+        // BANCO DE 55 QUESTÕES MINUCIOSAS
+        const BANCO_QUESTOES = {
+            1: [ // TÓPICO 1: A folha e a fotossíntese (11 Questões)
+                {
+                    id: 1,
+                    enunciado: "O parênquima clorofiliano paliçádico, geralmente localizado na face adaxial (superior) de folhas dorsiventrais, destaca-se por possuir células cilíndricas e justapostas. Qual é o papel dessa organização anatômica específica no processo fotossintético e como ela se relaciona com a captação de luz?",
+                    opcoes: [
+                        { texto: "Minimizar a transpiração estomática, retendo a luz refletida pelas paredes das células vizinhas.", correta: false },
+                        { texto: "Otimizar a absorção luminosa devido ao alinhamento vertical das células, que reduz a dispersão dos raios de luz ao longo do tecido fotossintetizante.", correta: true },
+                        { texto: "Favorecer a difusão rápida de dióxido de carbono até os vasos condutores de seiva bruta localizados no mesófilo.", correta: false },
+                        { texto: "Permitir o acúmulo de grande quantidade de água líquida para as reações de fotólise na fase química.", correta: false }
+                    ],
+                    explicacao: "A organização justaposta e perpendicular das células paliçádicas atua de modo semelhante a uma 'fibra óptica', permitindo que a luz solar atinja com alta eficiência os cloroplastos distribuídos ao longo dessas células, o que potencializa a captação de energia luminosa."
+                },
+                {
+                    id: 2,
+                    enunciado: "O movimento de abertura e fechamento dos estômatos é regulado diretamente por turgência celular das células-guarda. Diante de um estresse hídrico severo em uma folha, qual hormônio vegetal atua ativamente e qual o seu mecanismo iônico nas células-guarda?",
+                    opcoes: [
+                        { texto: "Auxina; provoca a entrada ativa de prótons H+ na célula.", correta: false },
+                        { texto: "Ácido Abscísico (ABA); estimula a saída de íons Potássio (K+), diminuindo a osmolaridade e promovendo a plasmólise destas células, o que fecha os estômatos.", correta: true },
+                        { texto: "Giberelina; estimula a captação de sacarose, deixando as células túrgidas e abertas.", correta: false },
+                        { texto: "Citocinina; induz o influxo de íons Cloro (Cl-) provocando a abertura estomática imediata.", correta: false }
+                    ],
+                    explicacao: "Em condições de seca, a planta produz Ácido Abscísico (ABA), que sinaliza o fechamento dos canais iônicos de influxo e ativa os canais de efluxo de Potássio (K+). Com o potássio migrando para as células anexas, a osmolaridade interna das células-guarda cai, fazendo-as perder água por osmose e murcharem, fechando a fenda estomática."
+                },
+                {
+                    id: 3,
+                    enunciado: "Analisando a anatomia foliar de plantas terrestres, os estômatos costumam estar localizados na epiderme inferior em folhas denominadas hipoestomáticas. Do ponto de vista ecológico e adaptativo, essa distribuição espacial visa prioritariamente conter qual processo?",
+                    opcoes: [
+                        { texto: "A entrada de oxigênio durante a respiração celular noturna.", correta: false },
+                        { texto: "A perda excessiva de água por transpiração induzida pelo vento e radiação solar direta.", correta: true },
+                        { texto: "A deposição de poeira e patógenos fúngicos nos tecidos do parênquima lacunoso.", correta: false },
+                        { texto: "A perda de dióxido de carbono que foi fixado no mesófilo foliar durante o dia.", correta: false }
+                    ],
+                    explicacao: "A face inferior da folha fica mais protegida da radiação solar direta e de correntes de ar intensas. Sendo assim, a localização hipoestomática reduz drasticamente o gradiente de pressão de vapor entre a folha e a atmosfera, controlando a transpiração cuticular e estomática."
+                },
+                {
+                    id: 4,
+                    enunciado: "O parênquima lacunoso (ou esponjoso) possui grandes espaços intercelulares. A importância fisiológica dessa disposição anatômica é permitir:",
+                    opcoes: [
+                        { texto: "A passagem de vasos lenhosos e liberianos pela folha.", correta: false },
+                        { texto: "A circulação livre e a difusão eficiente de gases (como CO2 e O2) no interior do mesófilo para a fotossíntese.", correta: true },
+                        { texto: "O acúmulo de grande quantidade de amido reserva na epiderme.", correta: false },
+                        { texto: "A captação rápida de calor para aumentar a temperatura foliar e acelerar enzimas de Calvin.", correta: false }
+                    ],
+                    explicacao: "Os amplos espaços intercelulares do parênquima lacunoso (lacunas) servem para viabilizar a livre circulação de gases oriundos do meio externo através dos estômatos, permitindo que o CO2 alcance com rapidez todas as células fotossintetizantes do mesófilo."
+                },
+                {
+                    id: 5,
+                    enunciado: "Uma folha de planta dicotiledônea foi colocada em uma câmara selada com luz constante de intensidade mediana. Inicialmente, o consumo de CO2 superou a respiração celular. Se a luz for reduzida até o Ponto de Compensação Fótico (Luminoso), o que ocorrerá?",
+                    opcoes: [
+                        { texto: "A taxa de fotossíntese será zero e a planta utilizará reservas de amido foliares.", correta: false },
+                        { texto: "A taxa de fotossíntese se igualará à taxa de respiração, de modo que o consumo de CO2 e liberação de O2 se anularão mutuamente na câmara.", correta: true },
+                        { texto: "A planta começará a realizar fermentação devido à falta total de energia química gerada nas mitocôndrias.", correct: false },
+                        { texto: "O consumo de CO2 disparará para tentar compensar a perda de energia química pela diminuição da luz.", correta: false }
+                    ],
+                    explicacao: "No Ponto de Compensação Fótico, todo o gás oxigênio produzido na fotossíntese é consumido pela respiração celular e, inversamente, todo o dióxido de carbono liberado pela respiração é fixado na fotossíntese. Não ocorrem trocas gasosas líquidas com o ambiente."
+                },
+                {
+                    id: 6,
+                    enunciado: "Algumas plantas terrestres adaptadas a regiões áridas apresentam folhas modificadas em espinhos. Qual é o papel biológico dessa estrutura adaptativa e qual órgão assume a função fotossintetizante secundária?",
+                    opcoes: [
+                        { texto: "Aumentar a área de absorção de luz; as raízes assumem a fotossíntese.", correta: false },
+                        { texto: "Evitar a herbivoria; os caules clorofilados (cladódios) realizam a fotossíntese secundária.", correta: true },
+                        { texto: "Estocar açúcares insolúveis; as flores realizam a fotossíntese.", correta: false },
+                        { texto: "Facilitar a dispersão de sementes; os pecíolos modificados fazem a fotossíntese.", correta: false }
+                    ],
+                    explicacao: "Em ambientes xerofíticos, folhas modificadas em espinhos diminuem consideravelmente a superfície foliar sujeita à transpiração hídrica, além de atuar na defesa mecânica. O caule (cladódio) clorofilado assume o papel fotossintetizante prioritário da planta."
+                },
+                {
+                    id: 7,
+                    enunciado: "O fechamento hidropassivo dos estômatos ocorre independentemente de fitormônios e se dá por:",
+                    opcoes: [
+                        { texto: "Aumento abrupto na quantidade de glicose solúvel nas células anexas.", correta: false },
+                        { texto: "Perda física direta de água pelas células estomáticas em condições de secura extrema da folha.", correta: true },
+                        { texto: "Injeção ativa de íons Sódio (Na+) nas células-guarda, despolarizando a membrana plasmática.", correta: false },
+                        { texto: "Contração violenta das mitocôndrias estomáticas estimuladas pela luz azul.", correta: false }
+                    ],
+                    explicacao: "O fechamento hidropassivo ocorre de forma física direta: quando a desidratação foliar é drástica, as células-guarda perdem água de forma mecânica para o mesófilo, murchando de imediato e fechando a fenda ostiolar sem necessidade de mediação iônica ativa."
+                },
+                {
+                    id: 8,
+                    enunciado: "As folhas de plantas de Sol (Heliófitas) e plantas de Sombra (Umbriófitas) diferem morfologicamente e fisiologicamente. Como se caracteriza uma folha de planta Umbriófita em relação à espessura e ao seu Ponto de Compensação Fótico?",
+                    opcoes: [
+                        { texto: "São folhas espessas com ponto de compensação fótico muito elevado.", correta: false },
+                        { texto: "São folhas tipicamente finas com ponto de compensação fótico muito baixo, sobrevivendo bem com baixa intensidade luminosa.", correta: true },
+                        { text: "Possuem cutícula extremamente grossa para refletir o excesso de radiação do sub-bosque.", correta: false },
+                        { texto: "Não possuem parênquima paliçádico e seu ponto de compensação fótico é variável de acordo com o vento.", correta: false }
+                    ],
+                    explicacao: "Plantas umbriófitas (sombra) necessitam otimizar a pouca luminosidade disponível no sub-bosque. Suas folhas são mais delgadas, amplas e com pontos de compensação luminosos baixos, permitindo que comecem a acumular energia mesmo sob baixos regimes de radiação."
+                },
+                {
+                    id: 9,
+                    enunciado: "Durante um experimento com estômatos, verificou-se que a luz azul desempenha papel fundamental na regulação estomática. Como funciona o mecanismo molecular da luz azul nos estômatos?",
+                    opcoes: [
+                        { texto: "Ativa fotorreceptores (fototropinas) que estimulam bombas de prótons H+-ATPase, hiperpolarizando a membrana e gerando força eletromotriz para o influxo de íons Potássio.", correta: true },
+                        { texto: "Inibe a fotólise da água na célula-guarda, forçando o fechamento preventivo dos poros.", correta: false },
+                        { texto: "Degrada diretamente as moléculas de clorofila, reduzindo a fotossíntese estomática.", correta: false },
+                        { texto: "Induz a conversão de amido em sacarose e a posterior egestão de sacarose da célula.", correta: false }
+                    ],
+                    explicacao: "A luz azul é captada por fototropinas nas células-guarda, que desencadeiam a ativação das bombas H+-ATPase. A expulsão de prótons torna o meio intracelular eletronegativo, induzindo a entrada massiva de potássio (K+), o que atrai água por osmose e abre os estômatos."
+                },
+                {
+                    id: 10,
+                    enunciado: "Qual estrutura foliar acelular, de natureza lipídica, recobre externamente a epiderme e tem como função principal impermeabilizar a folha contra a transpiração puramente cuticular?",
+                    opcoes: [
+                        { texto: "Parede celular secundária de lignina.", correta: false },
+                        { texto: "Cutícula rica em cutina.", correta: true },
+                        { texto: "Lamelas médias de pectina gelatinosa.", correta: false },
+                        { texto: "Suberina excretada pelas células dos vasos condutores.", correta: false }
+                    ],
+                    explicacao: "A cutícula é uma camada cerosa e lipofílica composta por polímeros de cutina e ceras extracelulares. Ela impede a evaporação descontrolada de água através da epiderme da folha, forçando a transpiração a ocorrer quase exclusivamente de modo regulado pelos estômatos."
+                },
+                {
+                    id: 11,
+                    enunciado: "Fisiologistas vegetais mediram o teor de água em uma folha bem hidratada sob vento constante de forte intensidade. Constataram o fechamento dos estômatos. Por que o vento causa esse comportamento estomático nas plantas terrestres?",
+                    opcoes: [
+                        { texto: "O vento reduz o teor de O2 em torno da folha, impedindo a respiração aeróbica estomática.", correta: false },
+                        { texto: "O vento remove a camada limite de vapor d'água adjacente às folhas, aumentando a transpiração a níveis críticos e induzindo o estresse hídrico na folha.", correta: true },
+                        { texto: "O vento resfria demais as células, inativando as enzimas da bomba de potássio.", correta: false },
+                        { texto: "O vento acelera a entrada de CO2 na folha, fazendo com que o excesso deste gás feche os poros estomáticos por feedback negativo.", correta: false }
+                    ],
+                    explicacao: "O vento forte varre a chamada microcamada limite de umidade (ar parado úmido) que recobre a epiderme foliar. Sem essa barreira de vapor, o gradiente de difusão de água para a atmosfera cresce violentamente, gerando rápida dessecação das células estomáticas que fecham para evitar a morte vegetal."
+                }
+            ],
+            2: [ // TÓPICO 2: Química da fotossíntese (11 Questões)
+                {
+                    id: 12,
+                    enunciado: "Na fase fotoquímica da fotossíntese, ocorre a fotólise da água (Reação de Hill). Qual é o papel biológico direto dos prótons (H+), dos elétrons e do oxigênio molecular (O2) produzidos nesse processo?",
+                    opcoes: [
+                        { texto: "Os prótons reduzem o CO2 no estroma; os elétrons estabilizam o Ciclo de Calvin e o oxigênio respira nas mitocôndrias vegetais.", correta: false },
+                        { texto: "Os elétrons repõem os elétrons perdidos pelo centro de reação do Clorofila-P680 (Fotossistema II); os prótons ajudam a formar o gradiente quimiosmótico e o oxigênio é liberado como subproduto gasoso.", correta: true },
+                        { texto: "Os elétrons reduzem a molécula de glicose diretamente; os prótons geram calor e o oxigênio aciona o fotossistema I.", correta: false },
+                        { texto: "Os prótons e elétrons formam água no estroma para prevenir o estresse salino celular e o oxigênio entra na fase escura.", correta: false }
+                    ],
+                    explicacao: "A quebra da água pela luz no complexo de evolução de oxigênio do Fotossistema II (P680) fornece elétrons para restaurar o estado fundamental da clorofila oxidada. Os prótons se acumulam no lúmen do tilacoide participando do gradiente eletroquímico para síntese de ATP pela ATP sintase, e o oxigênio livre evapora."
+                },
+                {
+                    id: 13,
+                    enunciado: "Durante a fotofosforilação cíclica nas membranas dos tilacoides, diferentemente da fotofosforilação acíclica, ocorre produção exclusiva de qual molécula energética, sem geração de redutores e oxigênio?",
+                    opcoes: [
+                        { texto: "NADPH", correta: false },
+                        { texto: "FADH2", correta: false },
+                        { texto: "ATP", correta: true },
+                        { texto: "Glicose-6-Fosfato", correta: false }
+                    ],
+                    explicacao: "Na rota cíclica, os elétrons excitados no Fotossistema I (P700) retornam à cadeia transportadora de elétrons do próprio fotossistema anterior, passando pelo citocromo b6f. Esse processo gera gradiente de prótons produzindo apenas ATP pela ATP sintase. Não há fotólise da água e nem redução de NADP+."
+                },
+                {
+                    id: 14,
+                    enunciado: "A enzima Rubisco (Ribulose-1,5-bifosfato carboxilase-oxigenase) desempenha papel central na fixação do carbono orgânico. No entanto, ela exibe atividade de oxigenase em condições específicas de baixo CO2 e alto O2 intracelulares. Esse processo problemático de desperdício energético nas plantas C3 chama-se:",
+                    opcoes: [
+                        { texto: "Ciclo de Krebs celular reversivo.", correta: false },
+                        { texto: "Fotorrespiração cloroplastidial.", correta: true },
+                        { texto: "Via C4 de Malato celular.", correta: false },
+                        { texto: "Descarboxilação oxidativa fotossintética.", correta: false }
+                    ],
+                    explicacao: "Quando a concentração de oxigênio é muito alta no cloroplasto (por exemplo, estômatos fechados no calor), a Rubisco fixa O2 em vez de CO2 na ribulose-1,5-bifosfato. Isso gera um composto tóxico (2-fosfoglicolato) que exige gasto energético em mitocôndrias e peroxissomos para ser metabolizado (Fotorrespiração)."
+                },
+                {
+                    id: 15,
+                    enunciado: "O Ciclo de Calvin (Fase Química) depende diretamente dos insumos acumulados na fase fotoquímica para prosseguir na síntese de carboidratos. Quais são esses insumos primordiais?",
+                    opcoes: [
+                        { texto: "Glicose livre e oxigênio dissolvido.", correta: false },
+                        { texto: "ATP e NADPH reduzido.", correta: true },
+                        { texto: "NADP+ e ADP oxidado.", correta: false },
+                        { texto: "Rubisco ativada e água livre.", correta: false }
+                    ],
+                    explicacao: "O Ciclo de Calvin utiliza a energia armazenada na molécula de ATP e o poder redutor do NADPH produzidos na fase fotoquímica para ligar os carbonos do dióxido de carbono inorgânico em moléculas trioses fosfatadas (G3P), que originarão a glicose."
+                },
+                {
+                    id: 16,
+                    enunciado: "Os pigmentos acessórios na antena dos cloroplastos (como carotenoides e clorofila b) possuem importância adaptativa crucial no processo fotossintético porque:",
+                    opcoes: [
+                        { texto: "Sintetizam ATP de forma alternativa à custa de energia infravermelha.", correta: false },
+                        { texto: "Ampliam o espectro de absorção da luz solar, canalizando a energia dos fótons absorvidos para a Clorofila a do centro de reação, além de oferecer fotoproteção ao aparato fotossintético.", correta: true },
+                        { texto: "Substituem a água como doadores primários de elétrons na reação ácida.", correta: false },
+                        { texto: "Permitem que a planta faça fotossíntese de forma eficiente mesmo na escuridão profunda.", correta: false }
+                    ],
+                    explicacao: "Os pigmentos acessórios absorvem comprimentos de onda de luz que a clorofila a sozinha não consegue reter de maneira ideal (como faixas do verde-azul). Eles transferem essa energia por ressonância eletromagnética para o centro de reação e previnem danos celulares por excesso de radiação (fotoproteção)."
+                },
+                {
+                    id: 17,
+                    enunciado: "Se marcarmos radioativamente o átomo de oxigênio incorporado na molécula de água fornecida a uma planta ($H_2^{18}O$), ao final do processo fotossintético esse oxigênio marcado será detectado em qual das substâncias abaixo?",
+                    opcoes: [
+                        { texto: "Glicose ($C_6H_{12}^{18}O_6$)", correta: false },
+                        { texto: "Gás Oxigênio ($^{18}O_2$)", correta: true },
+                        { texto: "Água regenerada ($H_2^{18}O$)", correta: false },
+                        { texto: "Dióxido de carbono gasoso ($C^{18}O_2$)", correta: false }
+                    ],
+                    explicacao: "Ficou experimentalmente provado que todo o gás oxigênio ($O_2$) liberado pela planta na fotossíntese é gerado na Reação de Hill a partir da fotólise de moléculas de água ($H_2O$), e não do dióxido de carbono ($CO_2$)."
+                },
+                {
+                    id: 18,
+                    enunciado: "O transporte acíclico de elétrons na fase clara exige a atividade integrada e em série de dois complexos proteico-pigmentares chamados Fotossistemas. O que impulsiona o elétron de baixos níveis de energia até níveis energéticos capazes de reduzir o NADP+?",
+                    opcoes: [
+                        { texto: "A quebra química de moléculas de frutose.", correta: false },
+                        { texto: "A absorção sucessiva de fótons luminosos (energia solar) em ambos os fotossistemas.", correta: true },
+                        { texto: "A força osmótica da entrada de sódio nos tilacoides.", correta: false },
+                        { texto: "A ação puramente gravitacional gerada pela diferença de massas atômicas entre NADP+ e NADPH.", correta: false }
+                    ],
+                    explicacao: "O fluxo de elétrons é termo-energeticamente viabilizado pela absorção contínua de fótons de luz solar em nível físico nos fotossistemas II e I. Cada fóton excita um elétron para um orbital molecular de nível energético mais alto (Z-scheme)."
+                },
+                {
+                    id: 19,
+                    enunciado: "A quimiosmose descrita por Peter Mitchell para a geração de ATP nos cloroplastos depende do fluxo de prótons ($H^+$) a favor de seu gradiente eletroquímico. Por onde os prótons fluem de volta para o estroma, ativando a catálise rotacional de conversão de ADP + Pi em ATP?",
+                    opcoes: [
+                        { texto: "Pelos lipídios hidrofóbicos da membrana do cloroplasto externo.", correta: false },
+                        { texto: "Pelo complexo enzimático transmembranar ATP sintase.", correta: true },
+                        { texto: "Pela enzima Rubisco fixadora de fósforo.", correta: false },
+                        { texto: "Diretamente por difusão facilitada por aquaporinas aquosas.", correta: false }
+                    ],
+                    explicacao: "O gradiente elétrico e de pH induz os prótons concentrados no lúmen do tilacoide a passarem de volta ao estroma pela porção canal CF0 da ATP sintase, gerando a rotação mecânica na porção catalítica CF1, ativando a fosforilação oxidativa/fotofosforilação do ADP."
+                },
+                {
+                    id: 20,
+                    enunciado: "A fotossíntese exibe dois espectros de ação fundamentais em relação à cor da luz visível. Sob qual luz monocromática a taxa fotossintética vegetal cai para seus níveis mínimos e sob quais luzes alcança seus picos máximos?",
+                    opcoes: [
+                        { texto: "Mínimo na luz verde; máximos nas luzes azul e vermelha.", correta: true },
+                        { texto: "Mínimo na luz vermelha; máximos nas luzes verde e amarela.", correta: false },
+                        { texto: "Mínimo na luz azul; máximos na luz verde e infravermelha.", correta: false },
+                        { texto: "Mínimo na luz roxa; máximos na luz verde e alaranjada.", correta: false }
+                    ],
+                    explicacao: "As clorofilas a e b absorvem muito mal a radiação na faixa do verde, refletindo-a (motivo de as plantas parecerem verdes). Os espectros de maior absorção e rendimento energético dão-se de forma acentuada nas faixas do azul (curto comprimento) e do vermelho (longo comprimento)."
+                },
+                {
+                    id: 21,
+                    enunciado: "Na via fotossintética C4, presente em gramíneas tropicais (como milho e cana), como ocorre o processo inicial de fixação do dióxido de carbono inorgânico para evitar a fotorrespiração?",
+                    opcoes: [
+                        { texto: "O CO2 é inicialmente incorporado ao ácido pirúvico nas células da bainha por ação da Rubisco em alta temperatura.", correta: false },
+                        { texto: "O CO2 é inicialmente fixado pela enzima PEP carboxilase em oxaloacetato (composto de 4 carbonos) nas células do mesófilo, concentrando posteriormente o CO2 na bainha para a Rubisco trabalhar com alta eficiência.", correta: true },
+                        { texto: "O CO2 é estocado em vacúolos gigantescos em forma de gás puro pressurizado.", correta: false },
+                        { texto: "A Rubisco é substituída inteiramente por enzimas sintetizadoras de amido direto.", correta: false }
+                    ],
+                    explicacao: "As plantas C4 resolvem a fotorrespiração separando fisicamente a fixação do CO2. A enzima PEP carboxilase (que não se liga ao O2) fixa o CO2 em ácido oxaloacético (4C) nas células do mesófilo. Este composto migra às células da bainha do feixe condutor, liberando CO2 concentrado diretamente para a Rubisco fazer o ciclo de Calvin clássico sem perdas."
+                },
+                {
+                    id: 22,
+                    enunciado: "As plantas CAM (Metabolismo Ácido das Crassuláceas), comuns em cactos, realizam adaptação temporal notável à seca. Como funciona o seu balanço gasoso e de fixação de CO2 ao longo das 24 horas do dia?",
+                    opcoes: [
+                        { texto: "Abrem estômatos de dia para absorver luz e fixam amido durante a noite escura.", correta: false },
+                        { texto: "Abrem estômatos apenas à noite para capturar CO2 e armazená-lo como ácido málico nos vacúolos; durante o dia mantêm estômatos fechados para evitar perda de água e utilizam o CO2 vacolar livre na fotossíntese.", correta: true },
+                        { texto: "Não possuem estômatos e absorvem carbono por difusão pelas raízes subterrâneas.", correta: false },
+                        { texto: "Efetuarão fotofosforilação acíclica à noite usando a energia magnética da Lua.", correta: false }
+                    ],
+                    explicacao: "As plantas CAM abrem os estômatos exclusivamente à noite, quando as perdas de água por transpiração são mínimas. O CO2 é fixado pela PEP-carboxilase em malato e estocado em forma de ácido málico no vacúolo de suas células. De dia, sob luz, os estômatos fecham e o ácido málico é quebrado liberando o CO2 para as reações de Calvin."
+                }
+            ],
+            3: [ // TÓPICO 3: Fotossíntese e quimiossíntese das bactérias (11 Questões)
+                {
+                    id: 23,
+                    enunciado: "As sulfobactérias purpúreas realizam a fotossíntese bacteriana ou anoxigênica. Qual é a principal diferença na matéria-prima doadora de elétrons e qual é o resíduo químico liberado por esses organismos quando comparados às plantas terrestres?",
+                    opcoes: [
+                        { texto: "Usam água e liberam gás oxigênio livre.", correta: false },
+                        { texto: "Usam sulfeto de hidrogênio (H2S) e liberam enxofre elementar molecular sólido (S), sem qualquer produção de oxigênio.", correta: true },
+                        { texto: "Usam monóxido de carbono e excretam ácido acético líquido no ambiente aquático.", correta: false },
+                        { texto: "Usam glicose exógena e liberam ácido sulfúrico em altas concentrações.", correta: false }
+                    ],
+                    explicacao: "As bactérias fotossintetizadoras anoxigênicas não empregam a água ($H_2O$) como doador de elétrons e hidrogênios. Elas usam sulfeto de hidrogênio ($H_2S$) ou outras moléculas reduzidas. Como consequência direta, em vez de oxigênio gasoso ($O_2$), excretam grânulos de enxofre sólido ($S$)."
+                },
+                {
+                    id: 24,
+                    enunciado: "A quimiossíntese é um processo autotrófico celular no qual a síntese de compostos orgânicos ocorre utilizando energia livre de reações químicas de oxidação inorgânica exógena. Quais grupos de bactérias do ciclo do nitrogênio do solo realizam ativamente esse processo e quais são seus respectivos substratos?",
+                    opcoes: [
+                        { texto: "Lactobacilos; quebram lactose do leite.", correta: false },
+                        { texto: "Nitrosomonas (nitrosação: oxidação de amônia a nitrito) e Nitrobacter (nitratação: oxidação de nitrito a nitrato).", correta: true },
+                        { texto: "Pseudomonas desnitrificantes; reduzem nitrato de volta a gás nitrogênio livre.", correta: false },
+                        { texto: "Rhizobium de nódulos de leguminosas; fixam nitrogênio usando ATP mitocondrial direto.", correta: false }
+                    ],
+                    explicacao: "As bactérias nitrificantes do solo oxidam compostos inorgânicos de nitrogênio para extrair a energia química necessária à fixação de carbono inorgânico ($CO_2$) em carboidratos. As Nitrosomonas oxidam amônia ($NH_3 \rightarrow NH_2^-$) e as Nitrobacter oxidam nitritos a nitratos ($NO_2^- \rightarrow NO_3^-$)."
+                },
+                {
+                    id: 25,
+                    enunciado: "As bactérias que realizam a fotossíntese bacteriana possuem pigmentos fotossintetizantes especializados diferentes das clorofilas a e b das plantas verdes. Esses pigmentos bacterianos recebem a denominação de:",
+                    opcoes: [
+                        { texto: "Bacteriocinas ativas.", correta: false },
+                        { texto: "Bacterioclorofilas.", correta: true },
+                        { texto: "Ficobilinas e fucoxantinas.", correta: false },
+                        { texto: "Ficocianinas vegetais.", correta: false }
+                    ],
+                    explicacao: "As bacterioclorofilas são os pigmentos de absorção luminosa característicos de bactérias fototróficas anoxigênicas. Elas absorvem comprimentos de onda de luz na faixa do infravermelho próximo, inacessíveis às plantas, permitindo nicho ecológico diferenciado no fundo de lagos."
+                },
+                {
+                    id: 26,
+                    enunciado: "Por que as cianobactérias são exceção no reino procarionte quanto ao tipo de fotossíntese realizada, sendo consideradas precursoras da evolução cloroplastidial?",
+                    opcoes: [
+                        { texto: "Por realizarem fotossíntese utilizando H2S e ácido nítrico.", correta: false },
+                        { texto: "Por realizarem fotossíntese oxigênica (idêntica à das plantas), utilizando água como doador de elétrons e contendo clorofila a associada a tilacoides livres no citoplasma.", correta: true },
+                        { texto: "Por não necessitarem de membrana biológica para o gradiente de prótons de fósforo.", correta: false },
+                        { texto: "Por se alimentarem apenas por fagocitose celular de outras bactérias verdes.", correta: false }
+                    ],
+                    explicacao: "As cianobactérias realizam fotossíntese oxigênica. Elas usam água e geram gás oxigênio. Segundo a teoria da endossimbiose de Lynn Margulis, cianobactérias ancestrais englobadas por células eucarióticas primitivas deram origem evolutiva aos cloroplastos atuais."
+                },
+                {
+                    id: 27,
+                    enunciado: "Bactérias metanogênicas realizam uma variação de quimiossíntese onde oxidam hidrogênio molecular para reduzir o gás carbônico. Esse processo resulta na formação de qual combustível gasoso comum no ambiente anaeróbico de aterros e pântanos?",
+                    opcoes: [
+                        { texto: "Gás Glicose hidratado.", correta: false },
+                        { texto: "Metano ($CH_4$).", correta: true },
+                        { texto: "Ácido sulfídrico concentrado.", correta: false },
+                        { texto: "Nitrogênio amoniacal líquido.", correta: false }
+                    ],
+                    explicacao: "As arqueas metanogênicas utilizam dióxido de carbono ($CO_2$) e hidrogênio gasoso ($H_2$) para obter energia de síntese celular, eliminando como produto final o gás metano ($CH_4$) de alta inflamabilidade e forte poder estufa."
+                },
+                {
+                    id: 28,
+                    enunciado: "A quimiossíntese bacteriana compreende duas fases sequenciais marcantes do ponto de vista cinético. Qual é a dinâmica dessas duas fases?",
+                    opcoes: [
+                        { texto: "Fase 1: Captação de luz; Fase 2: Quebra química de glicose externa.", correta: false },
+                        { texto: "Fase 1: Reação química de oxidação inorgânica exógena para produzir ATP e NADH (ou NADPH); Fase 2: Fixação do CO2 em compostos orgânicos usando essa energia e redutores obtidos na primeira etapa.", correta: true },
+                        { texto: "Fase 1: Fermentação ácida; Fase 2: Ciclo de Krebs para fabricação de ATP celular.", correta: false },
+                        { texto: "Fase 1: Absorção de água pelas raízes; Fase 2: Fotofosforilação acíclica no núcleo celular.", correta: false }
+                    ],
+                    explicacao: "A quimiossíntese ocorre em duas etapas: na primeira, a bactéria oxida um mineral inorgânico (como amônia, ferro ou enxofre) e guarda a energia liberada na forma de ATP e poder redutor. Na segunda fase, essa energia é usada de maneira análoga ao Ciclo de Calvin para construir cadeias carbônicas orgânicas."
+                },
+                {
+                    id: 29,
+                    enunciado: "As bactérias quimiolitoautotróficas oxidantes do ferro (como Acidithiobacillus ferrooxidans) são comumente encontradas em águas ácidas de minas de carvão e metais. Qual substrato elas oxidam e qual o impacto ecológico dessa atividade?",
+                    opcoes: [
+                        { texto: "Oxidam ferro férrico ($Fe^{3+}$) a ferro ferroso ($Fe^{2+}$); diminuindo a toxicidade da água.", correta: false },
+                        { texto: "Oxidam ferro ferroso ($Fe^{2+}$) a ferro férrico ($Fe^{3+}$); promovendo a precipitação de óxidos de ferro insolúveis e acidificando o meio por liberação de prótons H+.", correta: true },
+                        { texto: "Oxidam oxigênio puro a ozônio molecular; limpando a atmosfera local.", correta: false },
+                        { texto: "Transformam enxofre em sulfato de sódio purificado.", correta: false }
+                    ],
+                    explicacao: "Essas bactérias oxidam o íon solúvel ferroso ($Fe^{2+}$) para a forma férrica ($Fe^{3+}$), obtendo energia livre. A deposição de hidróxido férrico e compostos associados gera a famosa lama alaranjada tóxica que acidifica ecossistemas aquáticos minerários."
+                },
+                {
+                    id: 30,
+                    enunciado: "Em qual ecossistema marinho profundo extremo, desprovido de qualquer penetração de luz solar, a quimiossíntese de bactérias simbiontes serve como base de sustentação ecológica absoluta de cadeias tróficas complexas de vermes tubulares gigantes?",
+                    opcoes: [
+                        { texto: "Planícies abissais arenosas frias.", correta: false },
+                        { texto: "Fendas hidrotermais submarinas (fontes termais marinhas ou fendas vulcânicas escuras).", correta: true },
+                        { texto: "Zonas pelágicas de recifes de corais de águas profundas.", correta: false },
+                        { texto: "Zonas costeiras de estuários sedimentares.", correta: false }
+                    ],
+                    explicacao: "Nas fendas hidrotermais do leito marinho abissal, a água vulcânica emerge riquíssima em sulfeto de hidrogênio ($H_2S$). Bactérias quimiossintetizantes simbiontes usam o $H_2S$ para sintetizar compostos orgânicos, alimentando caranguejos, peixes e os vermes tubulares (Riftia), sustentando vida abundante na escuridão absoluta."
+                },
+                {
+                    id: 31,
+                    enunciado: "Certas bactérias verdes sulfurosas (Chlorobiaceae) não possuem cloroplastos, mas apresentam vesículas membranosas conectadas à face interna da membrana celular destinadas a otimizar a captura de luz. Como se chamam essas estruturas ricas em bacterioclorofilas?",
+                    opcoes: [
+                        { texto: "Mitocôndrias bacterianas.", correta: false },
+                        { texto: "Clorossomos.", correta: true },
+                        { texto: "Estromatólicos celulares.", correta: false },
+                        { texto: "Grana de cloroplasto bacteriano.", correta: false }
+                    ],
+                    explicacao: "Os clorossomos são complexos de captação de luz altamente eficientes e exclusivos de bactérias verdes sulfurosas. Eles concentram milhares de moléculas de bacterioclorofila sob a membrana celular, permitindo que a bactéria sobreviva sob intensidades de luz extremamente baixas."
+                },
+                {
+                    id: 32,
+                    enunciado: "Qual característica metabólica em comum aproxima as vias metabólicas da quimiossíntese e da fotossíntese de plantas?",
+                    opcoes: [
+                        { texto: "Ambas dependem de fótons luminosos do espectro vermelho para quebrar macromoléculas.", correta: false },
+                        { texto: "Ambas utilizam o ciclo de fixação de carbono inorgânico para produzir carboidratos simples, exigindo ATP celular e poder redutor.", correta: true },
+                        { texto: "Ambas geram oxigênio como resíduo metabólico gasoso obrigatório.", correta: false },
+                        { texto: "Ambas ocorrem exclusivamente no interior de cloroplastos eucarióticos complexos.", correta: false }
+                    ],
+                    explicacao: "Apesar de obterem energia original por fontes totalmente distintas (fotossíntese por radiação eletromagnética e quimiossíntese por oxidação química mineral), ambos os processos são autotróficos e convergem na redução e fixação do $CO_2$ em glicídios orgânicos."
+                },
+                {
+                    id: 33,
+                    enunciado: "No ciclo biogeoquímico do Enxofre, as bactérias quimiolitoautotróficas oxidantes do enxofre (como as Thiobacillus) desempenham papel crucial ao converter o gás sulfídrico tóxico e o enxofre elementar em qual forma aniônica assimilável pelas raízes de plantas?",
+                    opcoes: [
+                        { texto: "Sulfeto ($S^{2-}$)", correta: false },
+                        { texto: "Sulfato ($SO_4^{2-}$)", correta: true },
+                        { texto: "Sulfitos gasosos ($SO_3$)", correta: false },
+                        { texto: "Tiosulfato de ferro.", correta: false }
+                    ],
+                    explicacao: "As bactérias oxidantes do enxofre oxidam o $H_2S$ ou $S$ em sulfato ($SO_4^{2-}$). O sulfato gerado no solo é facilmente absorvido e assimilado pelas raízes dos vegetais para a síntese de aminoácidos sulfurados importantes, como a cisteína e metionina."
+                }
+            ],
+            4: [ // TÓPICO 4: A ação gênica (11 Questões)
+                {
+                    id: 34,
+                    enunciado: "O Dogma Central da Biologia Molecular rege o fluxo da informação genética celular. Em eucariotos, quais são os três eventos principais clássicos de transferência da informação e quais locais celulares (compartimentos) eles ocorrem?",
+                    opcoes: [
+                        { texto: "Replicação no nucléolo, Tradução no citoplasma e Splicing no retículo endoplasmático liso.", correta: false },
+                        { texto: "Replicação (síntese de DNA) no núcleo; Transcrição (síntese de RNA a partir do DNA de molde) no núcleo; Tradução (síntese proteica a partir do RNAm) nos ribossomos do citoplasma.", correta: true },
+                        { texto: "Splicing no citoplasma, Transcrição na membrana mitocondrial e Duplicação no aparelho de Golgi.", correta: false },
+                        { texto: "Tradução nucleolar, Transcrição citoplasmática e Replicação mitocondrial.", correta: false }
+                    ],
+                    explicacao: "A informação flui do DNA para o DNA por replicação (núcleo em eucariotos), do DNA para o RNA por transcrição (núcleo) e do RNA para as proteínas por tradução (citoplasma/ribossomo). Esse fluxo ordenado é a espinha dorsal de toda a fisiologia celular."
+                },
+                {
+                    id: 35,
+                    enunciado: "Durante a replicação do DNA, a síntese enzimática catalisada pela DNA polimerase ocorre obrigatoriamente no sentido 5' para 3'. Como a célula resolve o problema de duplicação simultânea da fita descontínua (fita retardada ou lagging strand)?",
+                    opcoes: [
+                        { texto: "Sintetizando a fita retardada no sentido 3' para 5' usando enzimas ribossômicas.", correta: false },
+                        { texto: "Sintetizando pequenos fragmentos de DNA conhecidos como Fragmentos de Okazaki, iniciados por primers de RNA e posteriormente unidos pela enzima DNA ligase.", correta: true },
+                        { texto: "Degradando a fita de molde descontínua para reconstruí-la apenas no citoplasma de forma contínua.", correta: false },
+                        { texto: "Utilizando a polimerase mitocondrial para duplicar as extremidades lineares cromossômicas de forma direta.", correta: false }
+                    ],
+                    explicacao: "Devido ao sentido antiparalelo do DNA e a limitação da DNA polimerase em só sintetizar de 5' para 3', a fita retardada é duplicada em pequenos pedaços invertidos chamados Fragmentos de Okazaki. A enzima DNA helicase abre a fita, a Primase coloca iniciadores de RNA (primers), a DNA polimerase preenche os trechos e a DNA ligase sela as lacunas."
+                },
+                {
+                    id: 36,
+                    enunciado: "O processamento alternativo do RNA ou splicing alternativo, que ocorre em células de organismos eucariotos durante a fase pós-transcricional, representa um mecanismo biológico de grande relevância evolutiva porque:",
+                    opcoes: [
+                        { texto: "Inibe a ação deletéria das mutações genéticas eliminando aminoácidos mutados.", correta: false },
+                        { texto: "Permite que um único gene codifique diferentes isoformas de proteínas unindo exons variados do pré-RNAm, explicando como o número de proteínas humanas supera amplamente o número de genes.", correta: true },
+                        { texto: "Converte de imediato o RNA em fita dupla estável para resistir aos lisossomos no citoplasma.", correta: false },
+                        { texto: "Elimina os exons inativos para manter apenas os introns codificantes na molécula madura.", correta: false }
+                    ],
+                    explicacao: "O splicing convencional remove os introns (regiões não codificantes) e une os exons (regiões codificantes). No splicing alternativo, diferentes arranjos de exons são selecionados para compor o RNAm final maduro. Dessa forma, um único gene de eucarioto pode produzir múltiplos polipeptídeos distintos."
+                },
+                {
+                    id: 37,
+                    enunciado: "Qual enzima desempenha o papel principal de parear nucleotídeos livres de ribonucleotídeos (A, U, C, G) com base na sequência molde de DNA para produzir uma molécula de RNAm primário durante a transcrição?",
+                    opcoes: [
+                        { texto: "DNA polimerase III.", correta: false },
+                        { texto: "RNA polimerase.", correta: true },
+                        { texto: "RNA primase replicadora.", correta: false },
+                        { texto: "Transcriptase reversa viral.", correta: false }
+                    ],
+                    explicacao: "A RNA polimerase reconhece as regiões promotoras do DNA, abre a fita dupla localmente e inicia o pareamento de ribonucleotídeos complementares (Uracila pareia com Adenina, Adenina com Timina, Guanina com Citosina), construindo a molécula de RNA."
+                },
+                {
+                    id: 38,
+                    enunciado: "Por que o processo de replicação do DNA celular é classificado como sendo de natureza semiconservativa?",
+                    opcoes: [
+                        { texto: "Porque apenas metade dos genes são copiados em cada rodada de divisão do ciclo celular.", correta: false },
+                        { texto: "Porque cada uma das novas fitas duplas geradas preserva integralmente uma das fitas originais (fita parental molde) e possui uma fita recém-sintetizada.", correta: true },
+                        { texto: "Porque apenas as bases de purinas (A e G) são preservadas intactas nas células-filhas.", correta: false },
+                        { texto: "Porque consome apenas metade da quantidade de nucleotídeos disponíveis nos cromossomos.", correta: false }
+                    ],
+                    explicacao: "Diz-se semiconservativo pois, na duplicação de uma dupla hélice de DNA, as duas fitas originais se separam e cada uma serve como molde para a síntese de uma fita complementar nova. Assim, as moléculas resultantes guardam sempre metade do material genético original."
+                },
+                {
+                    id: 39,
+                    enunciado: "O complexo ribonucleoproteico celular responsável por realizar o Splicing (remoção de introns e junção de exons) nos pré-RNAm eucarióticos denomina-se:",
+                    opcoes: [
+                        { texto: "Spliceossomo.", correta: true },
+                        { texto: "Ribossomo.", correta: false },
+                        { texto: "Nucleossomo histônico.", correta: false },
+                        { texto: "Complexo de transcrição basal.", correta: false }
+                    ],
+                    explicacao: "O spliceossomo é um grande complexo molecular formado por pequenos RNAs nucleares (snRNAs) e proteínas específicas que cliva e processa com altíssima precisão as fronteiras intron/exon do pré-RNA mensageiro recém-transcrito."
+                },
+                {
+                    id: 40,
+                    enunciado: "A replicação do DNA em procariontes e eucariontes apresenta uma diferença mecânica fundamental quanto às origens de replicação devido à estrutura cromossômica de cada grupo. Qual é essa diferença?",
+                    opcoes: [
+                        { texto: "Eucariotos possuem replicação linear sem início definido; procariontes começam em qualquer ponto.", correta: false },
+                        { texto: "Procariontes possuem apenas uma única origem de replicação devido ao cromossomo circular simples; eucariotos possuem múltiplas origens ao longo de seus longos cromossomos lineares.", correta: true },
+                        { texto: "Procariontes iniciam a replicação pelo nucléolo celular; eucariotos pelas mitocôndrias.", correta: false },
+                        { texto: "Procariontes duplicam o DNA em sentido tridimensional simultâneo e os eucariotos apenas em sentido bidimensional.", correta: false }
+                    ],
+                    explicacao: "O cromossomo bacteriano é pequeno e circular, necessitando de um único ponto inicial (oriC) para duplicar com eficácia. Já os cromossomos lineares e imensos de eucariotos exigem milhares de origens de replicação simultâneas para garantir que a duplicação se complete em tempo hábil para a divisão celular."
+                },
+                {
+                    id: 41,
+                    enunciado: "Durante a replicação, qual enzima impede o superenrolamento torcional descontrolado da fita dupla de DNA à medida que a forquilha de replicação é aberta pela helicase?",
+                    opcoes: [
+                        { texto: "DNA Ligase celular.", correta: false },
+                        { texto: "Topoisomerase (ou DNA Girase).", correta: true },
+                        { texto: "Ribonuclease H celular.", correta: false },
+                        { texto: "Polimerase fosfatase.", correta: false }
+                    ],
+                    explicacao: "A topoisomerase atua aliviando a tensão torcional gerada pela abertura rápida das fitas do DNA. Ela cliva temporariamente uma ou ambas as fitas do DNA à frente da forquilha, permite que elas desenrolem e volta a ligá-las de forma íntegra."
+                },
+                {
+                    id: 42,
+                    enunciado: "Durante o fluxo da ação gênica, se uma fita molde de DNA apresentar a sequência de nucleotídeos 3'-TAC GGC TTA ACT-5', qual será a sequência de bases do RNAm complementar transcrito?",
+                    opcoes: [
+                        { texto: "5'-ATG CCG AAT TGA-3'", correta: false },
+                        { texto: "5'-AUG CCG AAU UGA-3'", correta: true },
+                        { texto: "5'-UAC GGC UUA ACU-3'", correta: false },
+                        { texto: "5'-AUG CCG UUT UGA-3'", correta: false }
+                    ],
+                    explicacao: "O pareamento complementar da RNA polimerase gera um RNAm onde a Adenina pareia com Uracila (U), Timina com Adenina (A), Citosina com Guanina (G), e Guanina com Citosina (C). A sequência complementar a 3'-TAC GGC TTA ACT-5' será obrigatoriamente 5'-AUG CCG AAU UGA-3'."
+                },
+                {
+                    id: 43,
+                    enunciado: "A metilação do DNA e a acetilação de proteínas histonas regulam a transcrição sem alterar a sequência primária de nucleotídeos. Esse campo de estudo da genética que avalia alterações herdáveis que regulam a atividade gênica chama-se:",
+                    opcoes: [
+                        { texto: "Mutagenicidade reversa celular.", correta: false },
+                        { texto: "Epigenética.", correta: true },
+                        { texto: "Genômica de íntrons cromossômicos.", correta: false },
+                        { texto: "Clonagem vetorial de histonas.", correta: false }
+                    ],
+                    explicacao: "A epigenética estuda mudanças químicas (como adição de grupos metil ao DNA ou modificações nas caudas de histonas) que ativam ou silenciam genes sem alterar a sequência do código de nucleotídeos do DNA. Essas modificações epigenéticas podem sofrer influência do estilo de vida e do meio ambiente."
+                },
+                {
+                    id: 44,
+                    enunciado: "Em bactérias procariontes, a transcrição e a tradução ocorrem de forma quase simultânea e acoplada no mesmo espaço físico celular. Por que isso não ocorre em células eucarióticas normais?",
+                    opcoes: [
+                        { texto: "Porque eucariotos não sintetizam proteínas nos ribossomos normais.", correta: false },
+                        { texto: "Porque o envelope nuclear (carioteca) separa espacialmente o núcleo (onde ocorrem a transcrição e o splicing) do citoplasma (onde ocorre a tradução nos ribossomos).", correta: true },
+                        { texto: "Porque eucariotos degradam o RNAm antes de chegar ao citoplasma de forma programada.", correta: false },
+                        { texto: "Porque a transcrição eucariótica necessita de grande quantidade de oxigênio presente apenas no interior das cristas mitocondriais.", correta: false }
+                    ],
+                    explicacao: "A presença de envoltório nuclear (carioteca) em eucariotos cria uma barreira física. O RNAm primário precisa ser totalmente transcrito e processado (splicing, capeamento 5', cauda Poli-A) antes de ser exportado do núcleo para os ribossomos citoplasmáticos."
+                }
+            ],
+            5: [ // TÓPICO 5: Código genético (11 Questões)
+                {
+                    id: 45,
+                    enunciado: "O código genético é considerado 'degenerado' (ou redundante). Do ponto de vista biológico, qual é o significado correto dessa afirmação e sua vantagem fisiológica?",
+                    opcoes: [
+                        { texto: "Significa que o código sofreu deterioração evolutiva ao longo do tempo e perdeu estabilidade nas bases nitrogenadas.", correta: false },
+                        { texto: "Significa que um mesmo aminoácido pode ser codificado por diferentes códons (trincas de bases), o que amortece o efeito deletério de muitas mutações de ponto silenciosas.", correta: true },
+                        { texto: "Significa que uma única trinca de bases (códon) pode codificar múltiplos tipos diferentes de aminoácidos conforme o pH da célula.", correta: false },
+                        { texto: "Significa que o código genético se comporta de forma desordenada e imprecisa durante a divisão celular mitótica.", correta: false }
+                    ],
+                    explicacao: "O termo degenerado indica que a maioria dos aminoácidos possui mais de um códon de RNA correspondente. Por exemplo, os códons GCU, GCC, GCA e GCG codificam todos o aminoácido Alanina. Mutações na terceira base do códon frequentemente geram o mesmo aminoácido, não alterando a proteína final (mutação silenciosa)."
+                },
+                {
+                    id: 46,
+                    enunciado: "O código genético é considerado 'universal'. O que significa essa propriedade na biologia molecular moderna e como ela viabiliza a tecnologia de transgênicos?",
+                    opcoes: [
+                        { texto: "Significa que todos os astros e galáxias compartilham dos mesmos elementos inorgânicos de fósforo.", correta: false },
+                        { texto: "Significa que praticamente todos os seres vivos (de bactérias a seres humanos) compartilham as mesmas correspondências entre códons e aminoácidos, permitindo que um gene humano seja transcrito e traduzido com sucesso em uma bactéria transgênica.", correta: true },
+                        { texto: "Significa que proteínas humanas e bacterianas possuem o mesmo tamanho tridimensional e mesma massa molar absoluta.", correta: false },
+                        { texto: "Significa que o RNA transportador pode carregar qualquer aminoácido indistintamente em qualquer circunstância celular.", correta: false }
+                    ],
+                    explicacao: "A universalidade do código genético indica que a engrenagem molecular da vida compartilha a mesma linguagem. Logo, se inserirmos um fragmento de DNA humano que codifica a insulina em uma bactéria, a maquinaria celular da bactéria lerá as trincas da mesma forma, produzindo insulina humana ativa."
+                },
+                {
+                    id: 47,
+                    enunciado: "Dentre as 64 trincas possíveis do código genético celular, três não codificam nenhum aminoácido e servem como sinalizadores químicos de terminação (códons de parada ou stop codons). Quais são estas três sequências na molécula de RNAm?",
+                    opcoes: [
+                        { texto: "AUG, GUG, UGG", correta: false },
+                        { texto: "UAA, UAG, UGA", correta: true },
+                        { texto: "AAA, CCC, GGG", correta: false },
+                        { texto: "UUA, UUG, UGG", correta: false }
+                    ],
+                    explicacao: "Os códons de parada clássicos são UAA (ocre), UAG (âmbar) e UGA (opala). Quando o ribossomo encontra um desses códons no RNAm, fatores de liberação entram no sítio A da subunidade maior e finalizam a síntese, liberando a cadeia polipeptídica ativa."
+                },
+                {
+                    id: 48,
+                    enunciado: "Qual trinca do RNAm funciona universalmente como o códon de iniciação de leitura da síntese proteica no ribossomo eucariótico e qual aminoácido ela incorpora originalmente?",
+                    opcoes: [
+                        { texto: "UGA; prolina", correta: false },
+                        { texto: "AUG; metionina", correta: true },
+                        { texto: "GGG; glicina", correta: false },
+                        { texto: "UAA; triptofano", correta: false }
+                    ],
+                    explicacao: "A trinca AUG no RNAm sinaliza o local exato onde os ribossomos devem começar o processo de leitura e tradução. Ela codifica o aminoácido metionina, que será o primeiro da sequência do polipeptídeo em formação."
+                },
+                {
+                    id: 49,
+                    enunciado: "Uma mutação gênica pontual de substituição causou a troca de um único nucleotídeo no gene da cadeia beta da hemoglobina. Essa alteração fez com que o códon GAG (ácido glutâmico) passasse a ser GUG (valina), alterando toda a hemácia para formato de foice. Essa doença genética hereditária chama-se:",
+                    opcoes: [
+                        { texto: "Hemofilia clássica tipo A.", correta: false },
+                        { texto: "Anemia Falciforme.", correta: true },
+                        { texto: "Talassemia maior.", correta: false },
+                        { texto: "Distrofia muscular genética.", correta: false }
+                    ],
+                    explicacao: "A anemia falciforme é provocada por uma mutação de ponto clássica de substituição. A troca de ácido glutâmico por valina altera as interações hidrofóbicas da molécula de hemoglobina, que se polimeriza sob baixas concentrações de oxigênio, deformando as hemácias."
+                },
+                {
+                    id: 50,
+                    enunciado: "O RNA de transferência (RNAt) é a molécula responsável por correlacionar os códons aos aminoácidos correspondentes. Qual região do RNAt é responsável por reconhecer e emparelhar de forma complementar com o códon do RNAm no sítio ativo do ribossomo?",
+                    opcoes: [
+                        { texto: "Região aceptora de aminoácido CCA 3'.", correta: false },
+                        { texto: "Anticódon (trinca de bases localizada na alça central inferior do RNAt).", correta: true },
+                        { texto: "Braço de ligação mitocondrial D.", correta: false },
+                        { texto: "Cauda poli-A protetora.", correta: false }
+                    ],
+                    explicacao: "O anticódon é a sequência específica de 3 nucleotídeos exposta na estrutura espacial do RNAt. Ele se pareia de forma antiparalela e complementar com o códon do RNAm que se encontra exposto para tradução no ribossomo."
+                },
+                {
+                    id: 51,
+                    enunciado: "Durante a tradução, as moléculas de RNAt precisam estar ligadas aos seus aminoácidos correspondentes de forma correta. Qual enzima celular altamente seletiva catalisa essa ligação usando energia de ATP no processo conhecido como ativação do aminoácido?",
+                    opcoes: [
+                        { texto: "DNA Helicase replicadora.", correta: false },
+                        { texto: "Aminoacil-RNAt sintetase.", correta: true },
+                        { texto: "RNA polimerase II nuclear.", correta: false },
+                        { texto: "Peptidil transferase celular.", correta: false }
+                    ],
+                    explicacao: "A enzima aminoacil-RNAt sintetase catalisa a esterificação de um aminoácido específico com seu respectivo RNAt. Existem enzimas específicas para cada um dos 20 aminoácidos biológicos para garantir a fidelidade absoluta do processo."
+                },
+                {
+                    id: 52,
+                    enunciado: "A hipótese do oscilamento ('Wobble hypothesis'), proposta por Francis Crick, explica por que células não necessitam de 61 tipos diferentes de RNAt para reconhecer todos os 61 códons de aminoácidos. Como funciona essa hipótese?",
+                    opcoes: [
+                        { texto: "O anticódon muda de forma aleatória em alta temperatura ambiente.", correta: false },
+                        { texto: "O pareamento na terceira posição do códon do RNAm com a primeira posição do anticódon é menos rígido e permite acoplamentos atípicos (como bases modificadas como inosina pareando com U, C ou A).", correta: true },
+                        { texto: "Os ribossomos simplesmente saltam nucleotídeos em fitas muito longas.", correta: false },
+                        { texto: "Os aminoácidos são anexados em qualquer uma das alças laterais do RNAt.", correta: false }
+                    ],
+                    explicacao: "A hipótese do Wobble ('oscilação') mostra que a terceira base do códon do RNAm e a primeira base do anticódon do RNAt não exigem complementaridade geométrica perfeita de Watson-Crick. Isso permite que um único RNAt carregado consiga parear com mais de um códon sinônimo."
+                },
+                {
+                    id: 53,
+                    enunciado: "Se uma mutação de inserção adicionar um único nucleotídeo (por exemplo, uma Adenina) no meio da região codificante de um gene de proteína, o que ocorrerá com a tradução da proteína a partir daquele ponto?",
+                    opcoes: [
+                        { texto: "A tradução parará imediatamente em todos os casos de inserção celular.", correta: false },
+                        { texto: "Ocorre alteração da matriz de leitura ('frameshift'), modificando toda a sequência de aminoácidos subsequente à mutação.", correta: true },
+                        { texto: "A célula recupera a fita intacta usando a enzima de splicing no citoplasma.", correta: false },
+                        { texto: "Apenas um único aminoácido será alterado, mantendo a proteína funcional.", correta: false }
+                    ],
+                    explicacao: "Como a leitura é estritamente em trincas (de 3 em 3 nucleotídeos), a inserção (ou deleção) de 1 ou 2 bases desloca completamente a matriz de leitura ('frameshift'). A partir do ponto de mutação, todos os códons passam a ser diferentes dos originais, produzindo proteína disfuncional."
+                },
+                {
+                    id: 54,
+                    enunciado: "O sítio catalítico peptidil transferase, responsável por ligar covalentemente os aminoácidos (ligação peptídica) durante a tradução, localiza-se na subunidade maior do ribossomo. Qual molécula realiza essa atividade de catálise?",
+                    opcoes: [
+                        { texto: "Uma proteína histônica carregada de ferro.", correta: false },
+                        { texto: "O RNA ribossômico (RNAr), atuando como uma ribozima.", correta: true },
+                        { texto: "O RNA transportador celular associado ao citocromo c.", correta: false },
+                        { texto: "A enzima Rubisco carboxilase.", correta: false }
+                    ],
+                    explicacao: "A formação da ligação peptídica é catalisada não por uma enzima proteica clássica, mas sim por uma ribozima: um segmento de RNA presente na subunidade maior do ribossomo (RNA ribossômico 23S/28S). Esse achado reforça a hipótese do 'Mundo do RNA' na origem da vida."
+                },
+                {
+                    id: 55,
+                    enunciado: "Um polipeptídeo possui 150 resíduos de aminoácidos na sua conformação nativa ativa primária. Qual o número mínimo de nucleotídeos que o trecho codificante do RNAm (desconsiderando stop codons e cauda poli-A) deve possuir para traduzir essa proteína?",
+                    opcoes: [
+                        { texto: "150 nucleotídeos.", correta: false },
+                        { texto: "300 nucleotídeos.", correta: false },
+                        { texto: "450 nucleotídeos.", correta: true },
+                        { texto: "600 nucleotídeos.", correta: false }
+                    ],
+                    explicacao: "Cada resíduo de aminoácido é codificado por uma trinca de bases (1 códon = 3 nucleotídeos). Portanto, para codificar uma cadeia contínua de 150 aminoácidos, o segmento de RNAm correspondente deve possuir no mínimo $150 \times 3 = 450$ nucleotídeos de comprimento."
+                }
+            ]
+        };
 
-            // --- MOL, MASSA MOLAR E SOLUÇÕES (21-40) ---
-            { q: "O que representa a Constante de Avogadro (6,02 x 10<sup>23</sup>)?", options: ["A massa de um próton", "O número de partículas em 1 mol de qualquer substância", "A velocidade da luz no vácuo", "O número de elétrons no Oxigênio"], correct: 1, explain: "É a unidade de contagem da química, definindo o número de entidades em 1 mol.", topic: "Quantidade de Matéria" },
-            { q: "Qual a massa molar da Água (H<sub>2</sub>O)? (Dados: H=1, O=16)", options: ["17 g/mol", "18 g/mol", "10 g/mol", "32 g/mol"], correct: 1, explain: "(2x1) + 16 = 18 g/mol.", topic: "Massa Molar" },
-            { q: "Quantos mols existem em 88g de CO<sub>2</sub>? (Massa Molar do CO<sub>2</sub> = 44 g/mol)", options: ["1 mol", "2 mols", "0,5 mol", "4 mols"], correct: 1, explain: "n = m / MM -> 88 / 44 = 2 mols.", topic: "Quantidade de Matéria" },
-            { q: "Uma solução que contém a quantidade máxima de soluto que o solvente consegue dissolver a uma dada temperatura é chamada de:", options: ["Diluída", "Saturada", "Insuperável", "Concentrada"], correct: 1, explain: "Saturada atingiu o limite do coeficiente de solubilidade.", topic: "Soluções" },
-            { q: "Calcule a concentração comum (C) de uma solução com 20g de sal em 500mL de água.", options: ["10 g/L", "40 g/L", "20 g/L", "100 g/L"], correct: 1, explain: "C = m/V(L) -> 20g / 0,5L = 40 g/L.", topic: "Concentração Comum" },
-            { q: "O que acontece com a concentração de uma solução quando adicionamos apenas solvente?", options: ["Aumenta (Fica mais concentrada)", "Diminui (Ocorre diluição)", "Permanece igual", "O soluto desaparece"], correct: 1, explain: "Adicionar solvente aumenta o volume sem aumentar o soluto, diluindo a mistura.", topic: "Diluição" },
-            { q: "Qual a massa de 3 mols de Gás Oxigênio (O<sub>2</sub>)? (O=16)", options: ["32g", "48g", "96g", "16g"], correct: 2, explain: "O2 = 32 g/mol. 3 x 32 = 96g.", topic: "Massa Molar" },
-            { q: "Molaridade ou Concentração Molar (M) é expressa em que unidade?", options: ["g/L", "mol/L", "kg/mL", "mols/g"], correct: 1, explain: "Indica quantos mols de soluto existem por litro de solução.", topic: "Molaridade" },
-            { q: "Se eu tenho 1 mol de Glicose (C<sub>6</sub>H<sub>12</sub>O<sub>6</sub>), quantas moléculas eu tenho?", options: ["180 moléculas", "6,02 x 10<sup>23</sup> moléculas", "12 moléculas", "1,2 x 10<sup>24</sup> moléculas"], correct: 1, explain: "1 mol sempre contém o número de Avogadro de partículas.", topic: "Quantidade de Matéria" },
-            { q: "Uma solução 'soro fisiológico' tem 0,9% de NaCl em massa. Isso significa que:", options: ["Há 0,9g de NaCl em 100g de solução", "Há 9g em 1L", "A solução é pura", "Há 0,9 mols em 1L"], correct: 0, explain: "Título ou porcentagem em massa indica partes de soluto por 100 partes de solução.", topic: "Concentração" },
-            { q: "Qual o volume final de uma solução se eu diluir 100mL de suco concentrado para que o volume triplique?", options: ["100mL", "200mL", "300mL", "400mL"], correct: 2, explain: "Triplicar 100mL resulta em 300mL.", topic: "Diluição" },
-            { q: "Massa de NaOH necessária para preparar 1L de solução 0,5 mol/L? (MM do NaOH = 40g/mol)", options: ["40g", "20g", "80g", "10g"], correct: 1, explain: "0,5 mol/L em 1L = 0,5 mol. m = 0,5 * 40 = 20g.", topic: "Cálculo de Soluções" },
-            { q: "O ar atmosférico é um exemplo de:", options: ["Solução gasosa", "Substância pura", "Composto iônico", "Solução sólida"], correct: 0, explain: "Mistura homogênea de gases (Nitrogênio, Oxigênio, etc).", topic: "Soluções" },
-            { q: "Densidade de uma solução é a relação entre:", options: ["Massa do soluto e Volume da solução", "Massa da solução e Volume da solução", "Massa do soluto e Massa do solvente", "Volume e Temperatura"], correct: 1, explain: "Densidade engloba a massa total (soluto + solvente).", topic: "Propriedades" },
-            { q: "Quantos átomos de Ferro existem em 1 mol de Ferro?", options: ["26 átomos", "56 átomos", "6,02 x 10<sup>23</sup> átomos", "1 átomo"], correct: 2, explain: "1 mol de elemento = 6,02 x 10^23 átomos.", topic: "Quantidade de Matéria" },
-            { q: "Se a concentração de um poluente é 1 ppm (parte por milhão), isso equivale a:", options: ["1g por Litro", "1mg por Litro (em água)", "1kg por metro", "1% da massa"], correct: 1, explain: "1mg/L em água é aproximadamente 1 parte em 1.000.000 de partes.", topic: "Unidades de Concentração" },
-            { q: "A massa molar do Ácido Sulfúrico (H<sub>2</sub>SO<sub>4</sub>) é 98 g/mol. Qual a massa de 0,1 mol?", options: ["980g", "9,8g", "0,98g", "49g"], correct: 1, explain: "0,1 * 98 = 9,8g.", topic: "Cálculo Estequiométrico" },
-            { q: "Ao preparar um refresco em pó, o pó é o ____ e a água é o ____.", options: ["Solvente / Soluto", "Soluto / Solvente", "Mistura / Reagente", "Cátion / Ânion"], correct: 1, explain: "Soluto é o que se dissolve, solvente é o que dissolve.", topic: "Soluções" },
-            { q: "Qual a molaridade de uma solução com 2 mols de soluto em 4 litros de solução?", options: ["8 mol/L", "2 mol/L", "0,5 mol/L", "4 mol/L"], correct: 2, explain: "M = n/V -> 2/4 = 0,5 mol/L.", topic: "Molaridade" },
-            { q: "O volume molar de qualquer gás nas CNTP é aproximadamente:", options: ["22,4 L", "10,0 L", "2,0 L", "100 L"], correct: 0, explain: "Nas CNTP (0°C, 1 atm), 1 mol de gás ocupa 22,4 litros.", topic: "Gases" }
-        ];
+        // ESTADO GLOBAL DO JOGO (SALVO NA MEMÓRIA)
+        const gameState = {
+            score: 0,
+            progressoTopicos: {
+                1: 0, // Acertos no tópico 1
+                2: 0,
+                3: 0,
+                4: 0,
+                5: 0
+            },
+            questoesRespondidas: {
+                1: [], // IDs de questões já resolvidas no tópico 1
+                2: [],
+                3: [],
+                4: [],
+                5: []
+            },
+            topicoAtivo: null,
+            indiceQuestaoAtiva: 0,
+            somAtivo: true,
+            // Labs estáticos de pareamento de DNA e Cloroplastos
+            lab1Completo: false,
+            lab2Completo: false
+        };
 
-        let currentQuestion = 0;
-        let score = 0;
-        let answered = false;
-
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const endScreen = document.getElementById('end-screen');
-        const questionText = document.getElementById('question-text');
-        const optionsGrid = document.getElementById('options-grid');
-        const feedback = document.getElementById('feedback');
-        const feedbackText = document.getElementById('feedback-text');
-        const feedbackIcon = document.getElementById('feedback-icon');
-        const counterText = document.getElementById('question-counter');
-        const topicLabel = document.getElementById('topic-label');
-        const scoreText = document.getElementById('score-display');
-        const progressFill = document.getElementById('progress-fill');
-
-        function startGame() {
-            startScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
-            showQuestion();
+        // GERENCIAMENTO DE SOM VIA WEB AUDIO API (Sem arquivos externos!)
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
         }
 
-        function showQuestion() {
-            answered = false;
-            feedback.classList.add('hidden');
-            optionsGrid.innerHTML = '';
-            
-            const q = questions[currentQuestion];
-            questionText.innerHTML = q.q;
-            topicLabel.innerText = `Tópico: ${q.topic}`;
-            counterText.innerText = `Questão ${currentQuestion + 1} de ${questions.length}`;
-            
-            const prog = (currentQuestion / questions.length) * 100;
-            progressFill.style.width = `${prog}%`;
+        function tocarSom(tipo) {
+            if (!gameState.somAtivo) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
 
-            q.options.forEach((opt, index) => {
+                const t = audioCtx.currentTime;
+
+                if (tipo === 'acerto') {
+                    // Acorde alegre de acerto (frequências de bio-triunfo)
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, t); // C5
+                    osc.frequency.setValueAtTime(659.25, t + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, t + 0.16); // G5
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
+                    osc.start(t);
+                    osc.stop(t + 0.4);
+                } else if (tipo === 'erro') {
+                    // Frequência baixa dissonante
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(220.00, t); // A3
+                    osc.frequency.exponentialRampToValueAtTime(110.00, t + 0.3);
+                    gain.gain.setValueAtTime(0.15, t);
+                    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.35);
+                    osc.start(t);
+                    osc.stop(t + 0.35);
+                } else if (tipo === 'click') {
+                    // Clique rápido senoidal
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, t);
+                    gain.gain.setValueAtTime(0.08, t);
+                    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
+                    osc.start(t);
+                    osc.stop(t + 0.05);
+                } else if (tipo === 'vitoria') {
+                    // Melodia de missão cumprida
+                    const notas = [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50];
+                    notas.forEach((f, idx) => {
+                        const o = audioCtx.createOscillator();
+                        const g = audioCtx.createGain();
+                        o.type = 'sine';
+                        o.connect(g);
+                        g.connect(audioCtx.destination);
+                        o.frequency.setValueAtTime(f, t + (idx * 0.1));
+                        g.gain.setValueAtTime(0.1, t + (idx * 0.1));
+                        g.gain.exponentialRampToValueAtTime(0.001, t + (idx * 0.1) + 0.3);
+                        o.start(t + (idx * 0.1));
+                        o.stop(t + (idx * 0.1) + 0.3);
+                    });
+                }
+            } catch (e) {
+                console.warn("Web Audio API não suportada ou bloqueada pelo navegador.");
+            }
+        }
+
+        // ALTERNAR MUDO
+        document.getElementById('btn-mutar').addEventListener('click', () => {
+            gameState.somAtivo = !gameState.somAtivo;
+            const icone = document.getElementById('icone-som');
+            if (gameState.somAtivo) {
+                icone.setAttribute('data-lucide', 'volume-2');
+                icone.classList.remove('text-red-400');
+            } else {
+                icone.setAttribute('data-lucide', 'volume-x');
+                icone.classList.add('text-red-400');
+            }
+            lucide.createIcons();
+            tocarSom('click');
+        });
+
+        // ATUALIZAÇÃO DO PLACAR GLOBAL E DOS TEXTOS DE MAPA
+        function atualizarPlacares() {
+            // Contagem de progresso geral
+            let respondidasTotais = 0;
+            let acertosTotais = 0;
+            for (let i = 1; i <= 5; i++) {
+                respondidasTotais += gameState.questoesRespondidas[i].length;
+                acertosTotais += gameState.progressoTopicos[i];
+                
+                // Atualizar texto do mapa
+                const progText = document.getElementById(`prog-topico-${i}`);
+                if (progText) {
+                    const resolvidas = gameState.questoesRespondidas[i].length;
+                    const acertos = gameState.progressoTopicos[i];
+                    if (resolvidas === 0) {
+                        progText.textContent = "Não Iniciado (0/11)";
+                        progText.className = "text-xs text-slate-400 font-semibold";
+                    } else if (resolvidas < 11) {
+                        progText.textContent = `Em Progresso (${acertos}/${resolvidas} certas)`;
+                        progText.className = "text-xs text-amber-400 font-bold";
+                    } else {
+                        progText.textContent = `Concluído (${acertos}/11 acertos)`;
+                        progText.className = "text-xs text-emerald-400 font-bold";
+                    }
+                }
+            }
+
+            document.getElementById('global-score').textContent = gameState.score;
+            document.getElementById('global-progress').textContent = `${respondidasTotais}/55`;
+        }
+
+        // TELA DE NAVEGAÇÃO
+        function mostrarTela(idTela) {
+            const telas = ['tela-home', 'tela-quiz', 'tela-lab-traducao', 'tela-lab-fotosintese', 'tela-resultados'];
+            telas.forEach(t => {
+                const el = document.getElementById(t);
+                if (t === idTela) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function voltarParaHome() {
+            tocarSom('click');
+            mostrarTela('tela-home');
+            atualizarPlacares();
+        }
+
+        // INICIAR TÓPICO DO QUIZ
+        function iniciarTopico(numTopico) {
+            tocarSom('click');
+            gameState.topicoAtivo = numTopico;
+            
+            // Se já concluiu todas, oferece resetar apenas este tópico
+            if (gameState.questoesRespondidas[numTopico].length >= 11) {
+                gameState.questoesRespondidas[numTopico] = [];
+                gameState.progressoTopicos[numTopico] = 0;
+            }
+
+            gameState.indiceQuestaoAtiva = gameState.questoesRespondidas[numTopico].length;
+            
+            // Configurar cabeçalhos e badges da tela do quiz
+            const titulosTopicos = {
+                1: "Tópico 1: A Folha e a Fotossíntese",
+                2: "Tópico 2: A Química da Fotossíntese",
+                3: "Tópico 3: Fotossíntese Bacteriana e Quimiossíntese",
+                4: "Tópico 4: A Ação Gênica",
+                5: "Tópico 5: O Código Genético"
+            };
+            document.getElementById('quiz-badge-topico').textContent = titulosTopicos[numTopico];
+            
+            carregarQuestaoQuiz();
+            mostrarTela('tela-quiz');
+        }
+
+        // CARREGAR UMA QUESTÃO ESPECÍFICA DO BANCO NO TELA-QUIZ
+        function carregarQuestaoQuiz() {
+            const numTopico = gameState.topicoAtivo;
+            const questaoIndex = gameState.indiceQuestaoAtiva;
+            const listaQuestoes = BANCO_QUESTOES[numTopico];
+            const questao = listaQuestoes[questaoIndex];
+
+            // Resetar estados visuais do quiz
+            document.getElementById('quiz-num-atual').textContent = questaoIndex + 1;
+            document.getElementById('quiz-acertos-topico').textContent = gameState.progressoTopicos[numTopico];
+            
+            // Progresso da barra
+            const porc = ((questaoIndex) / 11) * 100;
+            document.getElementById('quiz-progresso-barra').style.width = `${porc}%`;
+
+            // Enunciado
+            document.getElementById('quiz-enunciado').innerHTML = formatarMath(questao.enunciado);
+
+            // Opções
+            const containerOpcoes = document.getElementById('quiz-opcoes');
+            containerOpcoes.innerHTML = '';
+            
+            questao.opcoes.forEach((opcao, idx) => {
+                const letra = String.fromCharCode(65 + idx); // A, B, C, D
                 const btn = document.createElement('button');
-                btn.className = "option-btn w-full text-left p-5 rounded-2xl font-semibold text-gray-700 bg-white shadow-sm";
-                btn.innerHTML = opt;
-                btn.onclick = () => checkAnswer(index);
-                optionsGrid.appendChild(btn);
+                btn.className = "w-full text-left glass p-5 rounded-xl border border-gray-800 hover:bg-slate-800/50 hover:border-emerald-500/30 transition-all flex items-start gap-4 text-sm group";
+                btn.onclick = () => responderQuestao(idx);
+                
+                btn.innerHTML = `
+                    <span class="flex-shrink-0 bg-slate-800 text-gray-300 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs group-hover:bg-emerald-500 group-hover:text-slate-950 transition-colors">${letra}</span>
+                    <span class="text-gray-200 mt-1">${formatarMath(opcao.texto)}</span>
+                `;
+                containerOpcoes.appendChild(btn);
+            });
+
+            // Esconder feedback box
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+        }
+
+        // RESPONDER QUESTÃO DO QUIZ
+        function responderQuestao(indiceOpcaoSelecionada) {
+            const numTopico = gameState.topicoAtivo;
+            const questaoIndex = gameState.indiceQuestaoAtiva;
+            const questao = BANCO_QUESTOES[numTopico][questaoIndex];
+            const opcoesBotoes = document.getElementById('quiz-opcoes').children;
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            const feedbackIcon = document.getElementById('quiz-feedback-icon');
+            const feedbackTitulo = document.getElementById('quiz-feedback-titulo');
+            const feedbackTexto = document.getElementById('quiz-feedback-texto');
+            const btnProxima = document.getElementById('quiz-btn-proxima');
+
+            // Prevenir múltiplos cliques desativando botões de opções
+            for (let btn of opcoesBotoes) {
+                btn.onclick = null;
+                btn.classList.add('cursor-not-allowed');
+            }
+
+            const acertou = questao.opcoes[indiceOpcaoSelecionada].correta;
+
+            // Destacar respostas corretas e incorretas
+            questao.opcoes.forEach((opcao, idx) => {
+                const btn = opcoesBotoes[idx];
+                const letraBadge = btn.querySelector('span');
+                if (opcao.correta) {
+                    btn.classList.remove('border-gray-800');
+                    btn.classList.add('border-emerald-500/60', 'bg-emerald-950/25');
+                    letraBadge.className = "flex-shrink-0 bg-emerald-500 text-slate-950 w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs";
+                } else if (idx === indiceOpcaoSelecionada) {
+                    btn.classList.remove('border-gray-800');
+                    btn.classList.add('border-rose-500/60', 'bg-rose-950/25');
+                    letraBadge.className = "flex-shrink-0 bg-rose-500 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs";
+                }
+            });
+
+            // Tratamento de feedback
+            feedbackBox.classList.remove('hidden');
+            if (acertou) {
+                tocarSom('acerto');
+                gameState.score += 100; // 100 pontos por acerto
+                gameState.progressoTopicos[numTopico]++;
+                gameState.questoesRespondidas[numTopico].push(questao.id);
+
+                feedbackBox.className = "glass p-6 rounded-2xl border-l-4 border-emerald-500 mb-6 transition-all duration-300 animate-fadeIn";
+                feedbackIcon.className = "p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                feedbackIcon.innerHTML = `<i data-lucide="check-circle" class="w-6 h-6"></i>`;
+                feedbackTitulo.textContent = "Resposta Correta! (+100 Pontos)";
+                feedbackTitulo.className = "font-extrabold text-emerald-400 text-base";
+            } else {
+                tocarSom('erro');
+                gameState.questoesRespondidas[numTopico].push(questao.id);
+
+                feedbackBox.className = "glass p-6 rounded-2xl border-l-4 border-rose-500 mb-6 transition-all duration-300 animate-fadeIn";
+                feedbackIcon.className = "p-2 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                feedbackIcon.innerHTML = `<i data-lucide="x-circle" class="w-6 h-6"></i>`;
+                feedbackTitulo.textContent = "Resposta Incorreta";
+                feedbackTitulo.className = "font-extrabold text-rose-400 text-base";
+            }
+
+            feedbackTexto.innerHTML = `<strong>Explicação:</strong> ${formatarMath(questao.explicacao)}`;
+            lucide.createIcons();
+
+            // Configuração do botão de avanço
+            if (questaoIndex + 1 < 11) {
+                btnProxima.innerHTML = `Próxima Questão <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+                btnProxima.onclick = () => {
+                    tocarSom('click');
+                    gameState.indiceQuestaoAtiva++;
+                    carregarQuestaoQuiz();
+                };
+            } else {
+                btnProxima.innerHTML = `Concluir Missão <i data-lucide="check-check" class="w-4 h-4"></i>`;
+                btnProxima.onclick = () => {
+                    tocarSom('vitoria');
+                    voltarParaHome();
+                };
+            }
+            lucide.createIcons();
+            atualizarPlacares();
+        }
+
+        // COMPORTAMENTO MATH FORMATTER BÁSICO PARA REPRODUÇÃO DE SINTAXES LATEX NO HTML
+        function formatarMath(texto) {
+            // Substitui de forma simples $...$ por tags italic e sub/sup para fórmulas químicas e biológicas
+            let formatado = texto;
+            // Substitui subscritos como H2O -> H₂O de forma simples
+            formatado = formatado.replace(/\$H_2O\$/g, "H₂O");
+            formatado = formatado.replace(/\$O_2\$/g, "O₂");
+            formatado = formatado.replace(/\$CO_2\$/g, "CO₂");
+            formatado = formatado.replace(/\$C_6H_{12}O_6\$/g, "C₆H₁₂O₆");
+            formatado = formatado.replace(/\$H_2S\$/g, "H₂S");
+            formatado = formatado.replace(/\$NADP\^+\$/g, "NADP⁺");
+            formatado = formatado.replace(/\$Fe\^{2+}\$/g, "Fe²⁺");
+            formatado = formatado.replace(/\$Fe\^{3+}\$/g, "Fe³⁺");
+            formatado = formatado.replace(/\$SO_4\^{2-}\$/g, "SO₄²⁻");
+            formatado = formatado.replace(/\$S\^{2-}\$/g, "S²⁻");
+            formatado = formatado.replace(/\$SO_3\$/g, "SO₃");
+            formatado = formatado.replace(/\$CH_4\$/g, "CH₄");
+            formatado = formatado.replace(/\$H\^+\$/g, "H⁺");
+            formatado = formatado.replace(/\$H_2\$/g, "H₂");
+            formatado = formatado.replace(/\$NH_3 \rightarrow NH_2\^-\$/g, "NH₃ &rarr; NH₂⁻");
+            formatado = formatado.replace(/\$NO_2^- \rightarrow NO_3^-\$/g, "NO₂⁻ &rarr; NO₃⁻");
+            
+            // Tratamento genérico de itálicos como $splicing$
+            formatado = formatado.replace(/\$([A-Za-z0-9\s,\-\+áéíóúâêôãõç\(\)]+)\$/g, "<span class='italic text-emerald-300'>$1</span>");
+            return formatado;
+        }
+
+
+        /* ==========================================
+           LABORATÓRIO 1: TRADUÇÃO (CÓDON / ANTICÓDON)
+           ========================================== */
+        const CODONS_POOL = [
+            { cod: "AUG", anticod: "UAC", amino: "Metionina (Início)" },
+            { cod: "UUU", anticod: "AAA", amino: "Fenilalanina" },
+            { cod: "GUA", anticod: "CAU", amino: "Valina" },
+            { cod: "CAG", anticod: "GUC", amino: "Glutamina" }
+        ];
+
+        let lab1Estado = {
+            selecionadoAnticodon: null,
+            ligadosCount: 0
+        };
+
+        function abrirLab(num) {
+            tocarSom('click');
+            if (num === 1) {
+                reiniciarLabTraducao();
+                mostrarTela('tela-lab-traducao');
+            } else {
+                reiniciarLabFotosintese();
+                mostrarTela('tela-lab-fotosintese');
+            }
+        }
+
+        function reiniciarLabTraducao() {
+            lab1Estado.selecionadoAnticodon = null;
+            lab1Estado.ligadosCount = 0;
+            document.getElementById('lab-traducao-sucesso').classList.add('hidden');
+            document.getElementById('lab-proteina-construcao').innerHTML = `<span class="text-xs text-slate-500 italic">Ligue os RNAts aos RNAms para sintetizar a proteína...</span>`;
+            
+            // Renderizar Códons (Fita de RNAm)
+            const codonsCont = document.getElementById('lab-codons-container');
+            codonsCont.innerHTML = '';
+            CODONS_POOL.forEach((item, idx) => {
+                const el = document.createElement('div');
+                el.id = `codon-target-${idx}`;
+                el.className = "bg-emerald-950/40 border-2 border-dashed border-emerald-500/20 p-4 rounded-xl text-center cursor-pointer hover:border-emerald-500/60 transition-all flex flex-col justify-center items-center h-24";
+                el.onclick = () => realizarPareamentoCodon(idx);
+                el.innerHTML = `
+                    <span class="text-[10px] text-emerald-400 font-bold tracking-widest uppercase">Códon ${idx+1}</span>
+                    <span class="text-xl font-black text-white">${item.cod}</span>
+                    <span id="codon-status-${idx}" class="text-[9px] text-slate-500 mt-1 font-semibold">Aguardando RNAt</span>
+                `;
+                codonsCont.appendChild(el);
+            });
+
+            // Renderizar Anticódons (Fita de RNAt) em ordem embaralhada
+            const anticodonsCont = document.getElementById('lab-anticodons-container');
+            anticodonsCont.innerHTML = '';
+            
+            // Embaralhar para o desafio
+            const indicesEmbaralhados = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+            indicesEmbaralhados.forEach(origIdx => {
+                const item = CODONS_POOL[origIdx];
+                const el = document.createElement('div');
+                el.id = `anticodon-btn-${origIdx}`;
+                el.className = "bg-slate-900 border border-slate-700/60 p-3 rounded-xl text-center cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/25 transition-all flex flex-col items-center justify-center h-20 select-none";
+                el.onclick = () => selecionarAnticodon(origIdx);
+                el.innerHTML = `
+                    <span class="text-[9px] text-cyan-400 font-bold tracking-widest uppercase">RNAt</span>
+                    <span class="text-lg font-bold text-white">${item.anticod}</span>
+                    <span class="text-[9px] text-slate-400 font-medium truncate w-full">${item.amino.split(" ")[0]}</span>
+                `;
+                anticodonsCont.appendChild(el);
             });
         }
 
-        function checkAnswer(index) {
-            if (answered) return;
-            answered = true;
-
-            const q = questions[currentQuestion];
-            const buttons = optionsGrid.getElementsByTagName('button');
-
-            if (index === q.correct) {
-                buttons[index].classList.add('correct');
-                score++;
-                scoreText.innerText = `Acertos: ${score}`;
-                feedbackIcon.innerText = "⭐";
-                feedbackText.innerHTML = `<strong class="text-green-700">Resposta Correta!</strong><br>${q.explain}`;
-                feedback.className = "mt-auto p-6 rounded-2xl bg-green-50 border-2 border-green-200 block animate-pulse";
-            } else {
-                buttons[index].classList.add('wrong');
-                buttons[q.correct].classList.add('correct');
-                feedbackIcon.innerText = "💡";
-                feedbackText.innerHTML = `<strong class="text-red-700">Não foi dessa vez...</strong><br>${q.explain}`;
-                feedback.className = "mt-auto p-6 rounded-2xl bg-red-50 border-2 border-red-200 block";
+        function selecionarAnticodon(origIdx) {
+            tocarSom('click');
+            // Remover seleção anterior
+            if (lab1Estado.selecionadoAnticodon !== null) {
+                const anterior = document.getElementById(`anticodon-btn-${lab1Estado.selecionadoAnticodon}`);
+                if (anterior) anterior.classList.remove('border-cyan-400', 'bg-cyan-950/40', 'glow-blue');
             }
 
-            for (let b of buttons) b.disabled = true;
+            lab1Estado.selecionadoAnticodon = origIdx;
+            const el = document.getElementById(`anticodon-btn-${origIdx}`);
+            el.classList.add('border-cyan-400', 'bg-cyan-950/40', 'glow-blue');
         }
 
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                showQuestion();
+        function realizarPareamentoCodon(codonIdx) {
+            if (lab1Estado.selecionadoAnticodon === null) {
+                tocarSom('erro');
+                return;
+            }
+
+            const rnatIdx = lab1Estado.selecionadoAnticodon;
+            const itemCodon = CODONS_POOL[codonIdx];
+            const itemRnat = CODONS_POOL[rnatIdx];
+
+            // Validar se o par selecionado é o correto
+            if (codonIdx === rnatIdx) {
+                tocarSom('acerto');
+                
+                // Sucesso de pareamento do par específico
+                const codonBox = document.getElementById(`codon-target-${codonIdx}`);
+                codonBox.className = "bg-emerald-900/35 border-2 border-emerald-500 p-4 rounded-xl text-center flex flex-col justify-center items-center h-24 shadow-md shadow-emerald-500/10";
+                codonBox.onclick = null; // Desabilitar cliques
+                codonBox.innerHTML = `
+                    <span class="text-[10px] text-emerald-400 font-bold tracking-widest uppercase">LIGADO</span>
+                    <span class="text-xs font-semibold text-slate-300">Códon: ${itemCodon.cod}</span>
+                    <span class="text-xs font-semibold text-cyan-400">&harr; RNAt: ${itemRnat.anticod}</span>
+                `;
+
+                // Remover RNAt clicado do pool
+                const anticodonBox = document.getElementById(`anticodon-btn-${rnatIdx}`);
+                anticodonBox.style.visibility = "hidden";
+
+                // Adicionar aminoácido à proteína
+                const proteinaCont = document.getElementById('lab-proteina-construcao');
+                if (lab1Estado.ligadosCount === 0) {
+                    proteinaCont.innerHTML = ''; // Remover placeholder
+                }
+                
+                const aminoEl = document.createElement('div');
+                aminoEl.className = "bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 text-xs font-extrabold px-3 py-1.5 rounded-lg border border-white/10 animate-scaleIn flex items-center gap-1.5 shadow-md shadow-emerald-500/5";
+                aminoEl.innerHTML = `<i data-lucide="pocket" class="w-3.5 h-3.5"></i> ${itemRnat.amino}`;
+                proteinaCont.appendChild(aminoEl);
+
+                // Criar ligação peptídica visual se não for o primeiro
+                if (lab1Estado.ligadosCount > 0) {
+                    // Adiciona um link de ligação peptídica
+                    const ligacao = document.createElement('span');
+                    ligacao.className = "text-slate-500 font-black text-sm px-1";
+                    ligacao.textContent = "—";
+                    proteinaCont.insertBefore(ligacao, aminoEl);
+                }
+
+                lucide.createIcons();
+
+                lab1Estado.selecionadoAnticodon = null;
+                lab1Estado.ligadosCount++;
+                gameState.score += 50;
+
+                // Vitória do lab
+                if (lab1Estado.ligadosCount === 4) {
+                    tocarSom('vitoria');
+                    document.getElementById('lab-traducao-sucesso').classList.remove('hidden');
+                    gameState.score += 300; // bônus
+                    atualizarPlacares();
+                }
             } else {
-                showEndScreen();
+                tocarSom('erro');
+                // feedback de erro leve
+                const codonBox = document.getElementById(`codon-target-${codonIdx}`);
+                codonBox.classList.add('border-rose-500', 'bg-rose-950/20');
+                setTimeout(() => {
+                    if (codonBox.onclick !== null) {
+                        codonBox.classList.remove('border-rose-500', 'bg-rose-950/20');
+                    }
+                }, 800);
             }
         }
 
-        function showEndScreen() {
-            gameScreen.classList.add('hidden');
-            endScreen.classList.remove('hidden');
-            
-            const percentage = Math.round((score / questions.length) * 100);
-            const finalScoreElem = document.getElementById('final-score');
-            const finalCircle = document.getElementById('final-circle');
-            
-            finalScoreElem.innerText = `${percentage}%`;
-            
-            // Animação do círculo de progresso
-            const offset = 552.92 - (552.92 * percentage) / 100;
-            setTimeout(() => {
-                finalCircle.style.strokeDashoffset = offset;
-            }, 100);
 
-            const msg = document.getElementById('performance-msg');
-            if (percentage === 100) msg.innerText = "Perfeito! Você dominou todos os conceitos. Nível Medicina/ITA! 🏆";
-            else if (percentage >= 80) msg.innerText = "Excelente desempenho! Você está muito bem preparado para os vestibulares. 🚀";
-            else if (percentage >= 60) msg.innerText = "Bom resultado! Você entende os conceitos básicos, mas revise os cálculos de concentração. 📊";
-            else if (percentage >= 40) msg.innerText = "Você está no caminho, mas precisa praticar mais exercícios de estequiometria e mol. 🧪";
-            else msg.innerText = "Não desanime! Química é uma matéria cumulativa. Revise a base de átomos e mols e tente novamente. 📚";
+        /* ==========================================
+           LABORATÓRIO 2: FOTOSSÍNTESE (CLASSIFICAÇÃO)
+           ========================================== */
+        const ELEMENTOS_FOTOSINTESE = [
+            { id: "e1", nome: "H₂O (Água)", local: "tilacoide", desc: "Doa elétrons no Fotossistema II" },
+            { id: "e2", nome: "Luz Solar", local: "tilacoide", desc: "Fornece energia inicial" },
+            { id: "e3", nome: "O₂ (Oxigênio)", local: "tilacoide", desc: "Subproduto da Reação de Hill" },
+            { id: "e4", nome: "CO₂ (Gás Carbônico)", local: "estroma", desc: "Fixado pela Rubisco no ciclo" },
+            { id: "e5", nome: "Glicose", local: "estroma", desc: "Produto de fixação do Ciclo de Calvin" },
+            { id: "e6", nome: "ADP + Pi", local: "tilacoide", desc: "Insumo para a ATP sintase" },
+            { id: "e7", nome: "NADP⁺", local: "tilacoide", desc: "Aceptor final de elétrons oxidado" },
+            { id: "e8", nome: "ATP", local: "estroma", desc: "Fornece fosfato e energia no ciclo" }
+        ];
+
+        let lab2Estado = {
+            selecionadoElementoId: null,
+            classificados: {} // idElemento: 'tilacoide' | 'estroma'
+        };
+
+        function reiniciarLabFotosintese() {
+            lab2Estado.selecionadoElementoId = null;
+            lab2Estado.classificados = {};
+            document.getElementById('lab-fotosintese-feedback').classList.add('hidden');
+            
+            // Limpar áreas
+            document.getElementById('zona-tilacoide-conteudo').innerHTML = '';
+            document.getElementById('zona-estroma-conteudo').innerHTML = '';
+
+            // Renderizar pool
+            const pool = document.getElementById('lab-elementos-pool');
+            pool.innerHTML = '';
+            ELEMENTOS_FOTOSINTESE.forEach(item => {
+                const el = document.createElement('div');
+                el.id = `fs-item-${item.id}`;
+                el.draggable = true;
+                el.className = "bg-slate-800 border border-slate-700/60 p-3 rounded-xl text-center cursor-pointer hover:border-amber-400 transition-all select-none flex flex-col justify-center items-center gap-1 text-xs active:scale-95";
+                
+                // Suporte drag and drop tradicional
+                el.ondragstart = (e) => iniciarDrag(e, item.id);
+                el.ondragend = terminarDrag;
+                
+                // Clique para selecionar (alternativa amigável a mobile)
+                el.onclick = () => selecionarElementoFS(item.id);
+
+                el.innerHTML = `
+                    <span class="font-extrabold text-white">${item.nome}</span>
+                    <span class="text-[9px] text-slate-400 block truncate w-full">${item.desc}</span>
+                `;
+                pool.appendChild(el);
+            });
+        }
+
+        // SUPORTE DRAG E CLIQUE MOBILE
+        function selecionarElementoFS(id) {
+            tocarSom('click');
+            if (lab2Estado.classificados[id]) return; // Já classificado
+
+            if (lab2Estado.selecionadoElementoId !== null) {
+                const anterior = document.getElementById(`fs-item-${lab2Estado.selecionadoElementoId}`);
+                if (anterior) anterior.classList.remove('border-amber-400', 'bg-slate-750', 'glow-green');
+            }
+
+            lab2Estado.selecionadoElementoId = id;
+            const el = document.getElementById(`fs-item-${id}`);
+            el.classList.add('border-amber-400', 'bg-slate-750', 'glow-green');
+        }
+
+        // Permitir Drop no container
+        function permitirDrop(e) {
+            e.preventDefault();
+        }
+
+        // Eventos de Drag
+        function iniciarDrag(e, id) {
+            lab2Estado.selecionadoElementoId = id;
+            e.dataTransfer.setData("text/plain", id);
+            document.getElementById(`fs-item-${id}`).classList.add('dragging');
+        }
+
+        function terminarDrag(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        // Ação de Drop
+        function realizarDrop(e, localDestino) {
+            e.preventDefault();
+            const id = lab2Estado.selecionadoElementoId;
+            if (!id) return;
+
+            processarClassificacaoFS(id, localDestino);
+        }
+
+        // Alternativa de toque (clicar na Zona de destino)
+        document.getElementById('zona-tilacoide').onclick = () => {
+            if (lab2Estado.selecionadoElementoId) {
+                processarClassificacaoFS(lab2Estado.selecionadoElementoId, 'tilacoide');
+            }
+        };
+
+        document.getElementById('zona-estroma').onclick = () => {
+            if (lab2Estado.selecionadoElementoId) {
+                processarClassificacaoFS(lab2Estado.selecionadoElementoId, 'estroma');
+            }
+        };
+
+        function processarClassificacaoFS(elementoId, localDestino) {
+            const item = ELEMENTOS_FOTOSINTESE.find(e => e.id === elementoId);
+            if (!item) return;
+
+            // Se o local de destino estiver correto
+            if (item.local === localDestino) {
+                tocarSom('acerto');
+                gameState.score += 50;
+                lab2Estado.classificados[elementoId] = localDestino;
+
+                // Remover do Pool original
+                const elOriginal = document.getElementById(`fs-item-${elementoId}`);
+                if (elOriginal) elOriginal.remove();
+
+                // Adicionar na lista de destino
+                const contDestino = document.getElementById(`zona-${localDestino}-conteudo`);
+                const elDest = document.createElement('div');
+                elDest.className = "bg-slate-900/90 border border-emerald-500/40 p-2 rounded-lg text-center text-xs animate-scaleIn flex flex-col justify-center items-center";
+                elDest.innerHTML = `
+                    <span class="font-bold text-emerald-400">${item.nome}</span>
+                    <span class="text-[9px] text-gray-400 leading-tight">${item.desc}</span>
+                `;
+                contDestino.appendChild(elDest);
+
+                lab2Estado.selecionadoElementoId = null;
+
+                // Checar finalização do laboratório
+                const concluidosCount = Object.keys(lab2Estado.classificados).length;
+                if (concluidosCount === ELEMENTOS_FOTOSINTESE.length) {
+                    tocarSom('vitoria');
+                    gameState.score += 300; // bônus
+                    document.getElementById('lab-fotosintese-feedback').classList.remove('hidden');
+                    document.getElementById('lab-fotosintese-feedback-texto').innerHTML = `
+                        <span class="text-emerald-400 font-extrabold text-base">Desafio Resolvido com Sucesso! (+300 pontos)</span> <br>
+                        Você estruturou as duas fases da fotossíntese de maneira exemplar para gabaritar o vestibular!
+                    `;
+                }
+            } else {
+                tocarSom('erro');
+                // feedback visual de erro na zona tentada
+                const zonaEl = document.getElementById(`zona-${localDestino}`);
+                zonaEl.classList.add('border-rose-500', 'bg-rose-950/20');
+                setTimeout(() => {
+                    zonaEl.classList.remove('border-rose-500', 'bg-rose-950/20');
+                }, 800);
+            }
+            atualizarPlacares();
+        }
+
+
+        /* ==========================================
+           TELA DE RESULTADOS E ESTATÍSTICAS DO ALUNO
+           ========================================== */
+        function mostrarResultadosFinais() {
+            tocarSom('click');
+            
+            let totalRespondido = 0;
+            let totalAcertos = 0;
+
+            for (let i = 1; i <= 5; i++) {
+                totalRespondido += gameState.questoesRespondidas[i].length;
+                totalAcertos += gameState.progressoTopicos[i];
+            }
+
+            // Atribuição de valores
+            document.getElementById('res-total-acertos').textContent = `${totalAcertos} / 55`;
+            const porc = totalRespondido > 0 ? Math.round((totalAcertos / totalRespondido) * 100) : 0;
+            document.getElementById('res-porcentagem').textContent = `${porc}%`;
+
+            // Classificação de Nível do Aluno
+            const statusEl = document.getElementById('res-nivel');
+            if (totalAcertos < 15) {
+                statusEl.textContent = "Iniciante (Requer Revisão Básica)";
+                statusEl.className = "text-base font-bold text-rose-400 block mt-2";
+            } else if (totalAcertos < 35) {
+                statusEl.textContent = "Intermediário (A caminho das vagas)";
+                statusEl.className = "text-base font-bold text-amber-400 block mt-2";
+            } else if (totalAcertos < 50) {
+                statusEl.textContent = "Avançado (Excelente desempenho!)";
+                statusEl.className = "text-base font-bold text-cyan-400 block mt-2";
+            } else {
+                statusEl.textContent = "Gabaritou o Vestibular! (Nível Medicina)";
+                statusEl.className = "text-base font-bold text-emerald-400 block mt-2 animate-bounce";
+            }
+
+            // Renderizar Gráficos dinâmicos por tópico com barras de aproveitamento
+            const grafCont = document.getElementById('res-grafico-container');
+            grafCont.innerHTML = '';
+
+            const titulosTopicos = {
+                1: "A Folha e a Fotossíntese",
+                2: "A Química da Fotossíntese",
+                3: "Fotossíntese Bacteriana e Quimiossíntese",
+                4: "A Ação Gênica",
+                5: "O Código Genético"
+            };
+
+            for (let i = 1; i <= 5; i++) {
+                const acertos = gameState.progressoTopicos[i];
+                const porcTopico = Math.round((acertos / 11) * 100);
+                
+                const itemGraf = document.createElement('div');
+                itemGraf.className = "space-y-1.5";
+                itemGraf.innerHTML = `
+                    <div class="flex justify-between text-xs font-semibold">
+                        <span class="text-slate-300">Tópico ${i}: ${titulosTopicos[i]}</span>
+                        <span class="text-white">${acertos}/11 acertos (${porcTopico}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-3 rounded-full overflow-hidden border border-slate-700/50">
+                        <div class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full" style="width: ${porcTopico}%"></div>
+                    </div>
+                `;
+                grafCont.appendChild(itemGraf);
+            }
+
+            mostrarTela('tela-resultados');
+        }
+
+        // REINICIAR TUDO
+        function reiniciarTudo() {
+            tocarSom('click');
+            gameState.score = 0;
+            for (let i = 1; i <= 5; i++) {
+                gameState.progressoTopicos[i] = 0;
+                gameState.questoesRespondidas[i] = [];
+            }
+            gameState.topicoAtivo = null;
+            gameState.indiceQuestaoAtiva = 0;
+            
+            atualizarPlacares();
+            voltarParaHome();
+        }
+
+        // INIT DO AMBIENTE
+        window.onload = function() {
+            atualizarPlacares();
+            lucide.createIcons();
         }
     </script>
 </body>
